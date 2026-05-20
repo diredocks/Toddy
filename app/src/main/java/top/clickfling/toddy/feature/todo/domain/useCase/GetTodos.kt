@@ -15,12 +15,12 @@ class GetTodos(
   ): Flow<List<Todo>> =
     // TODO: Sort in dao by providing corresponding methods
     repository.getTodos().map { todos ->
-      val filteredTodos = todos.filter(predicate)
-
-      when (todoOrder) {
-        TodoOrder.Due -> filteredTodos.sortedBy { it.due }
-        TodoOrder.Alphabetically -> filteredTodos.sortedBy { it.content }
-        TodoOrder.Creation -> filteredTodos.sortedBy { it.creation }
+      val ordered = when (todoOrder) {
+        TodoOrder.Due -> todos.sortedBy { it.due }
+        TodoOrder.Alphabetically -> todos.sortedBy { it.content }
+        TodoOrder.Creation -> todos.sortedBy { it.creation }
       }
+
+      ordered.filter(predicate).sortedBy { it.completed }
     }
 }

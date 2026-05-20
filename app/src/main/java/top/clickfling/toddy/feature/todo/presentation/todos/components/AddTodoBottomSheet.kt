@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +35,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import top.clickfling.toddy.common.utils.toLocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTodoBottomSheet(
   content: String = "",
+  due: Long? = null,
   onContentChange: (String) -> Unit = {},
   onDismissRequest: () -> Unit = {},
   onSaveClick: () -> Unit = {}
@@ -46,6 +51,17 @@ fun AddTodoBottomSheet(
   val scrollState = rememberScrollState()
   val sheetState = rememberBottomSheetState(SheetValue.Hidden)
   val scope = rememberCoroutineScope()
+
+  val dateString = remember(due) {
+    due?.let {
+      val localDate = it.toLocalDate()
+      val formatter = DateTimeFormatter.ofPattern(
+        "E, MMM d",
+        Locale.ENGLISH
+      )
+      localDate.format(formatter)
+    }
+  }
 
   ModalBottomSheet(
     sheetState = sheetState,
@@ -116,9 +132,13 @@ fun AddTodoBottomSheet(
         InputChip(
           onClick = {},
           label = {
-            Text("Set due date")
+            if (dateString != null) {
+              Text("Due $dateString")
+            } else {
+              Text("Set due date")
+            }
           },
-          selected = false,
+          selected = due != null,
           leadingIcon = {
             Icon(
               imageVector = Icons.Default.CalendarToday,
@@ -164,4 +184,10 @@ fun AddTodoBottomSheet(
 @Composable
 fun AddTodoBottomSheetPreview() {
   AddTodoBottomSheet()
+}
+
+@Preview(heightDp = 250, widthDp = 450)
+@Composable
+fun AddTodoBottomSheetWithContentPreview() {
+  AddTodoBottomSheet(content = "Return books", due = 0L)
 }

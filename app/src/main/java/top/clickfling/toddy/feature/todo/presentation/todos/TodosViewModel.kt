@@ -77,6 +77,7 @@ class TodosViewModel @Inject constructor(
       TodosEvent.ToggleSheetVisibility -> {
         state = state.copy(
           showSheet = !state.showSheet,
+          due = System.currentTimeMillis(),
           content = "",
         )
       }
@@ -87,6 +88,7 @@ class TodosViewModel @Inject constructor(
             todoUseCases.addTodo(
               Todo(
                 content = state.content,
+                due = state.due,
                 completed = false,
                 creation = System.currentTimeMillis(),
               )

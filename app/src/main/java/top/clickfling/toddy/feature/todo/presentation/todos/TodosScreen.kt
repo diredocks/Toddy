@@ -65,7 +65,10 @@ fun TodosScreenRoute(
     },
     onItemCompletedChange = {
       viewModel.onEvent(TodosEvent.ToggleTodoCompleted(it))
-    }
+    },
+    onItemDelete = {
+      viewModel.onEvent(TodosEvent.DeleteTodo(it))
+    },
   )
 }
 
@@ -78,6 +81,7 @@ fun TodosScreen(
   onSheetDismisRequest: () -> Unit = {},
   onContentChange: (String) -> Unit = {},
   onItemCompletedChange: (todo: Todo) -> Unit = {},
+  onItemDelete: (todo: Todo) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -154,6 +158,7 @@ fun TodosScreen(
             due = todo.due,
             completed = todo.completed,
             onCheckedChange = { onItemCompletedChange(todo) },
+            onSwipeEndToStart = { onItemDelete(todo) },
             modifier = Modifier.animateItem()
           )
         }
@@ -163,6 +168,7 @@ fun TodosScreen(
     if (state.showSheet) {
       AddTodoBottomSheet(
         content = state.content,
+        due = state.due,
         onDismissRequest = onSheetDismisRequest,
         onContentChange = onContentChange,
         onSaveClick = onSaveButtonClick,

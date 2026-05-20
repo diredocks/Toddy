@@ -26,21 +26,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTodoBottomSheet(
+  content: String = "",
+  onContentChange: (String) -> Unit = {},
   onDismissRequest: () -> Unit = {},
   onSaveClick: () -> Unit = {}
 ) {
   val scrollState = rememberScrollState()
   val sheetState = rememberBottomSheetState(SheetValue.Hidden)
+  val scope = rememberCoroutineScope()
 
   ModalBottomSheet(
     sheetState = sheetState,
@@ -56,20 +61,28 @@ fun AddTodoBottomSheet(
         verticalAlignment = Alignment.CenterVertically
       ) {
         BasicTextField(
-          value = "",
-          onValueChange = {},
+          value = content,
+          onValueChange = onContentChange,
           modifier = Modifier
             .weight(1.0f)
             .padding(horizontal = 24.dp),
           textStyle = TextStyle(fontSize = 20.sp),
           singleLine = true,
           decorationBox = { innerTextField ->
-            Text("New task", fontSize = 20.sp)
+            if (content.isEmpty()) {
+              Text("New task", fontSize = 20.sp)
+            }
             innerTextField()
           }
         )
         IconButton(
-          onClick = onSaveClick,
+          onClick = {
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+              if (!sheetState.isVisible) {
+                onSaveClick()
+              }
+            }
+          },
           modifier = Modifier.padding(end = 12.dp)
         ) {
           Icon(

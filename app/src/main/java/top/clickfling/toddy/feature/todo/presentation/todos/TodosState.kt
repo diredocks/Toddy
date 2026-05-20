@@ -9,4 +9,7 @@ data class TodosState (
   val showCompleted: Boolean = false,
   val beforeTimestamp: Long? = null,
   val showSheet: Boolean = false,
+  // new item related states
+  val content: String = "",
+  val due: Long? = null,
 )

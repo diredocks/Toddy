@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import top.clickfling.toddy.feature.todo.domain.model.InvalidTodoException
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.domain.useCase.TodoUseCases
 import top.clickfling.toddy.feature.todo.domain.util.TodoOrder
@@ -38,9 +39,28 @@ class TodosViewModel @Inject constructor(
         }
       }
 
+      is TodosEvent.ToggleTodoCompleted -> {
+        viewModelScope.launch {
+          try {
+            todoUseCases.addTodo(
+              event.todo.copy(
+                id = event.todo.id,
+                completed = !event.todo.completed
+              )
+            )
+          } catch (e: InvalidTodoException) {
+
+          }
+        }
+      }
+
       is TodosEvent.Order -> {
         if (state.todoOrder == event.todoOrder) return
         state = state.copy(todoOrder = event.todoOrder)
+      }
+
+      is TodosEvent.EnteredContent -> {
+        state = state.copy(content = event.content)
       }
 
       TodosEvent.RestoreTodo -> {
@@ -55,7 +75,27 @@ class TodosViewModel @Inject constructor(
       }
 
       TodosEvent.ToggleSheetVisibility -> {
-        state = state.copy(showSheet = !state.showSheet)
+        state = state.copy(
+          showSheet = !state.showSheet,
+          content = "",
+        )
+      }
+
+      TodosEvent.SaveTodo -> {
+        viewModelScope.launch {
+          try {
+            todoUseCases.addTodo(
+              Todo(
+                content = state.content,
+                completed = false,
+                creation = System.currentTimeMillis(),
+              )
+            )
+            state = state.copy(showSheet = !state.showSheet)
+          } catch (e: InvalidTodoException) {
+
+          }
+        }
       }
     }
   }

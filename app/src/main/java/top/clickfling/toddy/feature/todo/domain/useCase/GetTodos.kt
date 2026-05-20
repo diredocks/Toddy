@@ -13,8 +13,8 @@ class GetTodos(
     todoOrder: TodoOrder,
     predicate: (Todo) -> Boolean = { true }
   ): Flow<List<Todo>> =
+    // TODO: Sort in dao by providing corresponding methods
     repository.getTodos().map { todos ->
-
       val filteredTodos = todos.filter(predicate)
 
       when (todoOrder) {

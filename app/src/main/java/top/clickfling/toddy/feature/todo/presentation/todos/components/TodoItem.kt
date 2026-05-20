@@ -38,6 +38,8 @@ fun TodoItem(
   content: String,
   completed: Boolean,
   due: Long? = null,
+  onCheckedChange: (Boolean) -> Unit = {},
+  modifier: Modifier = Modifier,
 ) {
   val dateString = remember(due) {
     due?.let {
@@ -51,12 +53,13 @@ fun TodoItem(
   }
 
   ListItem(
+    modifier = modifier,
     checked = completed,
-    onCheckedChange = {},
+    onCheckedChange = onCheckedChange,
     leadingContent = {
       Checkbox(
         checked = completed,
-        onCheckedChange = {}
+        onCheckedChange = onCheckedChange
       )
     },
     supportingContent = {

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
-  @Query("SELECT * FROM todoentity")
+  @Query("SELECT * FROM todoentity ORDER BY completed")
   fun getTodos(): Flow<List<TodoEntity>>
 
   @Query("SELECT * FROM todoentity WHERE id = :id")

@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.presentation.todos.components.TodoItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,16 +115,22 @@ fun TodosScreen(
 @Composable
 fun TodosScreenPreview() {
   TodosScreen(
-    state = TodosState(), snackbarHostState = SnackbarHostState()
+    state = TodosState(
+      todos = listOf(
+        Todo(
+          false,
+          "blade bird",
+          0,
+          1716120000000L,
+        ),
+        Todo(
+          true,
+          "choke enough",
+          0,
+          1716129000000L,
+        ),
+      )
+    ),
+    snackbarHostState = SnackbarHostState()
   )
-}
-
-@Preview
-@Composable
-fun TodoItemPreview() {
-  Column {
-    TodoItem("Adam met Karl", 1716120000000L, false)
-    Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Alice met Bob", 1716420000000L, true)
-  }
 }

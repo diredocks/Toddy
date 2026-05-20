@@ -21,7 +21,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +40,10 @@ fun AddTodoBottomSheet(
   onSaveClick: () -> Unit = {}
 ) {
   val scrollState = rememberScrollState()
+  val sheetState = rememberBottomSheetState(SheetValue.Hidden)
 
   ModalBottomSheet(
+    sheetState = sheetState,
     onDismissRequest = onDismissRequest,
     dragHandle = {}
   ) {

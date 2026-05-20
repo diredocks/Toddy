@@ -27,18 +27,44 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import top.clickfling.toddy.feature.todo.domain.model.Todo
+import top.clickfling.toddy.feature.todo.presentation.todos.components.AddTodoBottomSheet
 import top.clickfling.toddy.feature.todo.presentation.todos.components.TodoItem
+
+@Composable
+fun TodosScreenRoute(
+  navController: NavController,
+  viewModel: TodosViewModel = hiltViewModel()
+) {
+  val state = viewModel.state
+
+  TodosScreen(
+    state = state,
+    onAddButtonClick = {
+      viewModel.onEvent(TodosEvent.ToggleSheetVisibility)
+    },
+    onSheetDismisRequest = {
+      viewModel.onEvent(TodosEvent.ToggleSheetVisibility)
+    }
+  )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodosScreen(
   state: TodosState,
-  snackbarHostState: SnackbarHostState,
+  onAddButtonClick: () -> Unit = {},
+  onSheetDismisRequest: () -> Unit = {}
 ) {
+  val snackbarHostState = remember { SnackbarHostState() }
+
   Scaffold(
     topBar = {
       MediumTopAppBar(
@@ -62,8 +88,7 @@ fun TodosScreen(
       )
     },
     floatingActionButton = {
-      FloatingActionButton(
-        onClick = {}) {
+      FloatingActionButton(onClick = onAddButtonClick) {
         Icon(
           imageVector = Icons.Default.Add, contentDescription = "Add todo"
         )
@@ -108,6 +133,10 @@ fun TodosScreen(
         }
       }
     }
+
+    if (state.showSheet) {
+      AddTodoBottomSheet(onSheetDismisRequest)
+    }
   }
 }
 
@@ -131,6 +160,5 @@ fun TodosScreenPreview() {
         ),
       )
     ),
-    snackbarHostState = SnackbarHostState()
   )
 }

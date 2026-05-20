@@ -8,4 +8,5 @@ data class TodosState (
   val todoOrder: TodoOrder = TodoOrder.Due,
   val showCompleted: Boolean = false,
   val beforeTimestamp: Long? = null,
+  val showSheet: Boolean = false,
 )

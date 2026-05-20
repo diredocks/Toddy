@@ -53,6 +53,10 @@ class TodosViewModel @Inject constructor(
       TodosEvent.ToggleCompletedVisibility -> {
         state = state.copy(showCompleted = !state.showCompleted)
       }
+
+      TodosEvent.ToggleSheetVisibility -> {
+        state = state.copy(showSheet = !state.showSheet)
+      }
     }
   }
 

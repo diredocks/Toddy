@@ -23,7 +23,7 @@ import kotlin.time.Clock
 @HiltViewModel
 class TodosViewModel @Inject constructor(
   private val todoUseCases: TodoUseCases
-): ViewModel() {
+) : ViewModel() {
   var state by mutableStateOf(TodosState())
     private set
 
@@ -35,7 +35,7 @@ class TodosViewModel @Inject constructor(
   }
 
   fun onEvent(event: TodosEvent) {
-    when(event) {
+    when (event) {
       is TodosEvent.DeleteTodo -> {
         viewModelScope.launch {
           todoUseCases.deleteTodo(event.todo)

@@ -9,4 +9,4 @@ data class Todo(
   val id: Int? = null,
 ) {}
 
-class InvalidTodoException(message: String): Exception(message)
+class InvalidTodoException(message: String) : Exception(message)

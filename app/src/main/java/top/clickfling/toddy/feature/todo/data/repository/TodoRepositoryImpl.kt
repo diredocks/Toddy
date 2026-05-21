@@ -10,7 +10,7 @@ import top.clickfling.toddy.feature.todo.domain.repository.TodoRepository
 
 class TodoRepositoryImpl(
   private val dao: TodoDao
-): TodoRepository {
+) : TodoRepository {
   override fun getTodos(): Flow<List<Todo>> {
     return dao.getTodos().map { entities -> entities.map { it.toDomain() } }
   }

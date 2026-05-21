@@ -24,13 +24,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.presentation.todos.components.AddTodoBottomSheet
 import top.clickfling.toddy.feature.todo.presentation.todos.components.TodoItem
@@ -69,6 +77,9 @@ fun TodosScreenRoute(
     onItemDelete = {
       viewModel.onEvent(TodosEvent.DeleteTodo(it))
     },
+    onItemRestore = {
+      viewModel.onEvent(TodosEvent.RestoreTodo)
+    }
   )
 }
 
@@ -82,9 +93,12 @@ fun TodosScreen(
   onContentChange: (String) -> Unit = {},
   onItemCompletedChange: (todo: Todo) -> Unit = {},
   onItemDelete: (todo: Todo) -> Unit = {},
+  onItemRestore: () -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+  val scope = rememberCoroutineScope()
+  var snackbarJob by remember { mutableStateOf<Job?>(null) }
 
   Scaffold(
     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -158,7 +172,23 @@ fun TodosScreen(
             due = todo.due,
             completed = todo.completed,
             onCheckedChange = { onItemCompletedChange(todo) },
-            onSwipeEndToStart = { onItemDelete(todo) },
+            onSwipeEndToStart = {
+              onItemDelete(todo)
+              snackbarJob?.cancel()
+              snackbarJob = scope.launch {
+                snackbarHostState.currentSnackbarData?.dismiss()
+
+                var result = snackbarHostState.showSnackbar(
+                  message = "Todo deleted",
+                  actionLabel = "Undo",
+                  duration = SnackbarDuration.Short
+                )
+
+                if (result == SnackbarResult.ActionPerformed) {
+                  onItemRestore()
+                }
+              }
+            },
             modifier = Modifier.animateItem()
           )
         }

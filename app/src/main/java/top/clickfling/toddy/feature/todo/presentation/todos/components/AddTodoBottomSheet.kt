@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -45,10 +46,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import top.clickfling.toddy.feature.todo.presentation.todos.util.DueSelection
@@ -101,11 +101,14 @@ fun AddTodoBottomSheet(
           modifier = Modifier
             .weight(1.0f)
             .padding(horizontal = 24.dp),
-          textStyle = TextStyle(fontSize = 20.sp),
+          textStyle = MaterialTheme.typography.titleLarge.copy(
+            color = MaterialTheme.colorScheme.onSurface
+          ),
           singleLine = true,
+          cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
           decorationBox = { innerTextField ->
             if (content.isEmpty()) {
-              Text("New task", fontSize = 20.sp)
+              Text("New task", fontSize = MaterialTheme.typography.titleLarge.fontSize)
             }
             innerTextField()
           }

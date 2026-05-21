@@ -17,6 +17,7 @@ import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.domain.useCase.TodoUseCases
 import top.clickfling.toddy.feature.todo.domain.util.TodoOrder
 import top.clickfling.toddy.feature.todo.presentation.todos.util.toDueDays
+import top.clickfling.toddy.feature.todo.presentation.todos.util.toRemindTime
 import javax.inject.Inject
 import kotlin.time.Clock
 
@@ -71,6 +72,10 @@ class TodosViewModel @Inject constructor(
         state = state.copy(due = event.dueSelection.toDueDays())
       }
 
+      is TodosEvent.SelectRemind -> {
+        state = state.copy(remind = event.remindSelection.toRemindTime())
+      }
+
       TodosEvent.RestoreTodo -> {
         viewModelScope.launch {
           todoUseCases.addTodo(recentlyDeletedTodo ?: return@launch)
@@ -86,6 +91,7 @@ class TodosViewModel @Inject constructor(
         state = state.copy(
           showSheet = !state.showSheet,
           due = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays(),
+          remind = null,
           content = "",
         )
       }
@@ -97,13 +103,14 @@ class TodosViewModel @Inject constructor(
               Todo(
                 content = state.content,
                 due = state.due,
+                remind = state.remind,
                 completed = false,
                 creation = Clock.System.now().epochSeconds,
               )
             )
             state = state.copy(showSheet = !state.showSheet)
           } catch (e: InvalidTodoException) {
-
+            // TODO: Show error via snack bar
           }
         }
       }

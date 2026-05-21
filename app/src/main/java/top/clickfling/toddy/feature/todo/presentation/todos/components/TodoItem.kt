@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -39,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +53,7 @@ fun TodoItem(
   content: String,
   completed: Boolean,
   due: Long? = null,
+  remind: Long? = null,
   onCheckedChange: (Boolean) -> Unit = {},
   onSwipeEndToStart: () -> Unit = {},
   modifier: Modifier = Modifier,
@@ -148,35 +149,50 @@ fun TodoItem(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall,
           )
-          dateString?.let {
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-              modifier = Modifier
-                .size(4.dp)
-                .clip(CircleShape)
-                .background(
-                  MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                )
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-              modifier = Modifier.size(10.dp),
-              imageVector = Icons.Default.CalendarToday,
-              contentDescription = "Date"
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-              text = it,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              style = MaterialTheme.typography.labelSmall,
-            )
-          }
+          if (dateString == null) return@Row
+          Box(
+            modifier = Modifier
+              .padding(horizontal = 5.dp)
+              .size(3.dp)
+              .clip(CircleShape)
+              .background(
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+              )
+          )
+          Icon(
+            modifier = Modifier.size(10.dp),
+            imageVector = Icons.Default.CalendarToday,
+            contentDescription = "Date"
+          )
+          Spacer(modifier = Modifier.width(4.dp))
+          Text(
+            text = dateString,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall,
+          )
+          if (remind == null) return@Row
+          Box(
+            modifier = Modifier
+              .padding(horizontal = 5.dp)
+              .size(3.dp)
+              .clip(CircleShape)
+              .background(
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+              )
+          )
+          Icon(
+            modifier = Modifier.size(12.dp),
+            imageVector = Icons.Default.NotificationsNone,
+            contentDescription = "Remind"
+          )
         }
       },
     ) {
       Text(
         text = content,
-        style = if (completed) TextStyle(textDecoration = TextDecoration.LineThrough) else TextStyle()
+        style = MaterialTheme.typography.bodyMedium.copy(
+          textDecoration = TextDecoration.LineThrough.takeIf { completed }
+        )
       )
     }
   }
@@ -188,7 +204,7 @@ fun TodoItemPreview() {
   Column {
     TodoItem("Adam met Karl", false, 171612000L)
     Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Alice met Bob", true, 171642000L)
+    TodoItem("Alice met Bob", true, 171642000L, remind = 0)
     Spacer(modifier = Modifier.height(8.dp))
     TodoItem("Xiaoping met Elihu", true)
   }

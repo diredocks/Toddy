@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.presentation.todos.components.AddTodoBottomSheet
 import top.clickfling.toddy.feature.todo.presentation.todos.components.TodoItem
-import top.clickfling.toddy.feature.todo.presentation.todos.util.DueSelection
+import top.clickfling.toddy.feature.todo.presentation.todos.util.ChipSelection
 
 @Composable
 fun TodosScreenRoute(
@@ -79,6 +79,9 @@ fun TodosScreenRoute(
     },
     onDueSelection = {
       viewModel.onEvent(TodosEvent.SelectDue(it))
+    },
+    onRemindSelection = {
+      viewModel.onEvent(TodosEvent.SelectRemind(it))
     }
   )
 }
@@ -94,7 +97,8 @@ fun TodosScreen(
   onItemCompletedChange: (todo: Todo) -> Unit = {},
   onItemDelete: (todo: Todo) -> Unit = {},
   onItemRestore: () -> Unit = {},
-  onDueSelection: (DueSelection) -> Unit = {},
+  onDueSelection: (ChipSelection) -> Unit = {},
+  onRemindSelection: (ChipSelection) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -171,6 +175,7 @@ fun TodosScreen(
           TodoItem(
             content = todo.content,
             due = todo.due,
+            remind = todo.remind,
             completed = todo.completed,
             onCheckedChange = { onItemCompletedChange(todo) },
             onSwipeEndToStart = {
@@ -200,10 +205,12 @@ fun TodosScreen(
       AddTodoBottomSheet(
         content = state.content,
         due = state.due,
+        remind = state.remind,
         onDismissRequest = onSheetDismissRequest,
         onContentChange = onContentChange,
         onSaveClick = onSaveButtonClick,
         onDueSelection = onDueSelection,
+        onRemindSelection = onRemindSelection,
       )
     }
   }
@@ -219,13 +226,14 @@ fun TodosScreenPreview() {
           false,
           "blade bird",
           0,
-          1716120000000L,
+          171612000L,
+          id = 0,
         ),
         Todo(
           true,
           "choke enough",
           0,
-          1716129000000L,
+          id = 1,
         ),
       )
     ),

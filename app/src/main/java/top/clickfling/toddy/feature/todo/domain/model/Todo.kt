@@ -7,6 +7,6 @@ data class Todo(
   val due: Long? = null,
   val remind: Long? = null,
   val id: Int? = null,
-) {}
+)
 
 class InvalidTodoException(message: String) : Exception(message)

@@ -12,4 +12,5 @@ data class TodosState(
   // new item related states
   val content: String = "",
   val due: Long? = null,
+  val remind: Long? = null,
 )

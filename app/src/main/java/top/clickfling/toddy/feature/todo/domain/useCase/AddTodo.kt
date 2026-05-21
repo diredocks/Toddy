@@ -3,7 +3,6 @@ package top.clickfling.toddy.feature.todo.domain.useCase
 import top.clickfling.toddy.feature.todo.domain.model.InvalidTodoException
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.domain.repository.TodoRepository
-import kotlin.jvm.Throws
 
 class AddTodo(
   private val repository: TodoRepository

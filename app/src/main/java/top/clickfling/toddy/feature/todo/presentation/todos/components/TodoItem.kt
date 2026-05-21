@@ -43,11 +43,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import kotlinx.coroutines.launch
-import top.clickfling.toddy.common.utils.toLocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -62,11 +59,10 @@ fun TodoItem(
 ) {
   val dateString = remember(due) {
     due?.let {
-      val localDate = it.toLocalDate()
-      val formatter = DateTimeFormatter.ofPattern(
-        "E, MMM d", Locale.ENGLISH
-      )
-      localDate.format(formatter)
+      val localDate = LocalDate.fromEpochDays(it)
+      val dayOfWeek = localDate.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+      val month = localDate.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+      "$dayOfWeek, $month ${localDate.day}"
     }
   }
   val dismissState = rememberSwipeToDismissBoxState()
@@ -114,7 +110,7 @@ fun TodoItem(
                 .fillMaxHeight()
                 .fillMaxWidth(progress)
                 .background(
-                  color = lerp(Color.LightGray, Color.Red, progress),
+                  color = lerp(MaterialTheme.colorScheme.outlineVariant, Color.Red, progress),
                   shape = RoundedCornerShape(100.dp)
                 )
             ) {
@@ -190,9 +186,9 @@ fun TodoItem(
 @Composable
 fun TodoItemPreview() {
   Column {
-    TodoItem("Adam met Karl", false, 1716120000000L)
+    TodoItem("Adam met Karl", false, 171612000L)
     Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Alice met Bob", true, 1716420000000L)
+    TodoItem("Alice met Bob", true, 171642000L)
     Spacer(modifier = Modifier.height(8.dp))
     TodoItem("Xiaoping met Elihu", true)
   }

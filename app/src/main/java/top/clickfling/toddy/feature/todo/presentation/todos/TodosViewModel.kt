@@ -10,11 +10,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import top.clickfling.toddy.feature.todo.domain.model.InvalidTodoException
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.domain.useCase.TodoUseCases
 import top.clickfling.toddy.feature.todo.domain.util.TodoOrder
+import top.clickfling.toddy.feature.todo.presentation.todos.util.toDueDays
 import javax.inject.Inject
+import kotlin.time.Clock
 
 @HiltViewModel
 class TodosViewModel @Inject constructor(
@@ -63,6 +67,10 @@ class TodosViewModel @Inject constructor(
         state = state.copy(content = event.content)
       }
 
+      is TodosEvent.SelectDue -> {
+        state = state.copy(due = event.dueSelection.toDueDays())
+      }
+
       TodosEvent.RestoreTodo -> {
         viewModelScope.launch {
           todoUseCases.addTodo(recentlyDeletedTodo ?: return@launch)
@@ -77,7 +85,7 @@ class TodosViewModel @Inject constructor(
       TodosEvent.ToggleSheetVisibility -> {
         state = state.copy(
           showSheet = !state.showSheet,
-          due = System.currentTimeMillis(),
+          due = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays(),
           content = "",
         )
       }
@@ -90,7 +98,7 @@ class TodosViewModel @Inject constructor(
                 content = state.content,
                 due = state.due,
                 completed = false,
-                creation = System.currentTimeMillis(),
+                creation = Clock.System.now().epochSeconds,
               )
             )
             state = state.copy(showSheet = !state.showSheet)

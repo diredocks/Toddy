@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +28,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,13 +39,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.presentation.todos.components.AddTodoBottomSheet
 import top.clickfling.toddy.feature.todo.presentation.todos.components.TodoItem
+import top.clickfling.toddy.feature.todo.presentation.todos.util.DueSelection
 
 @Composable
 fun TodosScreenRoute(
@@ -62,7 +59,7 @@ fun TodosScreenRoute(
     onAddButtonClick = {
       viewModel.onEvent(TodosEvent.ToggleSheetVisibility)
     },
-    onSheetDismisRequest = {
+    onSheetDismissRequest = {
       viewModel.onEvent(TodosEvent.ToggleSheetVisibility)
     },
     onContentChange = {
@@ -79,6 +76,9 @@ fun TodosScreenRoute(
     },
     onItemRestore = {
       viewModel.onEvent(TodosEvent.RestoreTodo)
+    },
+    onDueSelection = {
+      viewModel.onEvent(TodosEvent.SelectDue(it))
     }
   )
 }
@@ -89,11 +89,12 @@ fun TodosScreen(
   state: TodosState,
   onAddButtonClick: () -> Unit = {},
   onSaveButtonClick: () -> Unit = {},
-  onSheetDismisRequest: () -> Unit = {},
+  onSheetDismissRequest: () -> Unit = {},
   onContentChange: (String) -> Unit = {},
   onItemCompletedChange: (todo: Todo) -> Unit = {},
   onItemDelete: (todo: Todo) -> Unit = {},
   onItemRestore: () -> Unit = {},
+  onDueSelection: (DueSelection) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -199,9 +200,10 @@ fun TodosScreen(
       AddTodoBottomSheet(
         content = state.content,
         due = state.due,
-        onDismissRequest = onSheetDismisRequest,
+        onDismissRequest = onSheetDismissRequest,
         onContentChange = onContentChange,
         onSaveClick = onSaveButtonClick,
+        onDueSelection = onDueSelection,
       )
     }
   }

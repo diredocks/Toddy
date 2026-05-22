@@ -59,6 +59,21 @@ class TodosViewModel @Inject constructor(
         }
       }
 
+      is TodosEvent.ToggleTodoImportance -> {
+        viewModelScope.launch {
+          try {
+            todoUseCases.addTodo(
+              event.todo.copy(
+                id = event.todo.id,
+                important = !event.todo.important
+              )
+            )
+          } catch (e: InvalidTodoException) {
+
+          }
+        }
+      }
+
       is TodosEvent.Order -> {
         if (state.todoOrder == event.todoOrder) return
         state = state.copy(todoOrder = event.todoOrder)

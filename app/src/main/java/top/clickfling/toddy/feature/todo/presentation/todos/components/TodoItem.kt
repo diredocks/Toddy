@@ -20,9 +20,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.NotificationsNone
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -45,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlin.math.abs
 import kotlin.time.Instant
 
@@ -54,16 +57,14 @@ import kotlin.time.Instant
 fun TodoItem(
   content: String,
   completed: Boolean,
+  important: Boolean,
   due: LocalDate? = null,
   remind: Instant? = null,
+  modifier: Modifier = Modifier,
   onCheckedChange: (Boolean) -> Unit = {},
   onSwipeEndToStart: () -> Unit = {},
-  modifier: Modifier = Modifier,
+  onStarClicked: () -> Unit = {},
 ) {
-  val currentSystemTimeZone = remember {
-    TimeZone.currentSystemDefault()
-  }
-
   val dateString = remember(due) {
     due?.let { localDate ->
       val dayOfWeek =
@@ -145,12 +146,24 @@ fun TodoItem(
       }
     }) {
     ListItem(
-      checked = completed,
-      onCheckedChange = onCheckedChange,
-      leadingContent = {
-        Checkbox(
-          checked = completed, onCheckedChange = onCheckedChange
-        )
+      selected = completed,
+      onClick = {},
+      leadingContent = { Checkbox(checked = completed, onCheckedChange = onCheckedChange) },
+      trailingContent = {
+        IconButton(
+          onClick = onStarClicked,
+          colors = IconButtonDefaults.iconButtonColors(
+            contentColor = if (important)
+              MaterialTheme.colorScheme.primary
+            else
+              MaterialTheme.colorScheme.onSurfaceVariant
+          )
+        ) {
+          Icon(
+            imageVector = if (important) Icons.Default.Star else Icons.Default.StarBorder,
+            contentDescription = "Important"
+          )
+        }
       },
       supportingContent = {
         // TODO: Highlighting colors on special states
@@ -215,10 +228,10 @@ fun TodoItem(
 @Composable
 fun TodoItemPreview() {
   Column {
-    TodoItem("Adam met Karl", false, LocalDate(2023, 1 ,3))
+    TodoItem("Adam met Karl", false, true, LocalDate(2023, 1, 3))
     Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Alice met Bob", true, LocalDate(2023, 4 ,5), Instant.fromEpochMilliseconds(0))
+    TodoItem("Alice met Bob", true, false, LocalDate(2023, 4, 5), Instant.fromEpochMilliseconds(0))
     Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Xiaoping met Elihu", true)
+    TodoItem("Xiaoping met Elihu", true, true)
   }
 }

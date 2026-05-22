@@ -82,6 +82,9 @@ fun TodosScreenRoute(
     },
     onRemindSelection = {
       viewModel.onEvent(TodosEvent.SelectRemind(it))
+    },
+    onItemImportanceChange = {
+      viewModel.onEvent(TodosEvent.ToggleTodoImportance(it))
     }
   )
 }
@@ -99,6 +102,7 @@ fun TodosScreen(
   onItemRestore: () -> Unit = {},
   onDueSelection: (ChipSelection) -> Unit = {},
   onRemindSelection: (ChipSelection) -> Unit = {},
+  onItemImportanceChange: (todo: Todo) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -175,8 +179,10 @@ fun TodosScreen(
           TodoItem(
             content = todo.content,
             due = todo.due,
+            important = todo.important,
             remind = todo.remind,
             completed = todo.completed,
+            modifier = Modifier.animateItem(),
             onCheckedChange = { onItemCompletedChange(todo) },
             onSwipeEndToStart = {
               onItemDelete(todo)
@@ -195,7 +201,7 @@ fun TodosScreen(
                 }
               }
             },
-            modifier = Modifier.animateItem()
+            onStarClicked = { onItemImportanceChange(todo) }
           )
         }
       }

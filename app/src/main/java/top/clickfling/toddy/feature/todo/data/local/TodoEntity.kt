@@ -8,6 +8,7 @@ import kotlin.time.Instant
 @Entity
 data class TodoEntity(
   val completed: Boolean = false,
+  val important: Boolean = false,
   val content: String,
   val creation: Instant,
   val due: LocalDate? = null,

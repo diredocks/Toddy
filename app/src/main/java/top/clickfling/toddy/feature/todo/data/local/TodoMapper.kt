@@ -5,6 +5,7 @@ import top.clickfling.toddy.feature.todo.domain.model.Todo
 fun TodoEntity.toDomain(): Todo {
   return Todo(
     completed = completed,
+    important = important,
     content = content,
     due = due,
     creation = creation,
@@ -16,6 +17,7 @@ fun TodoEntity.toDomain(): Todo {
 fun Todo.toEntity(): TodoEntity {
   return TodoEntity(
     completed = completed,
+    important = important,
     content = content,
     due = due,
     creation = creation,

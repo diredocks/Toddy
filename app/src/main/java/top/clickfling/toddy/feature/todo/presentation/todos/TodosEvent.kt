@@ -9,6 +9,7 @@ sealed class TodosEvent {
   data class DeleteTodo(val todo: Todo) : TodosEvent()
   data class EnteredContent(val content: String) : TodosEvent()
   data class ToggleTodoCompleted(val todo: Todo) : TodosEvent()
+  data class ToggleTodoImportance(val todo: Todo): TodosEvent()
   data class SelectDue(val dueSelection: ChipSelection) : TodosEvent()
   data class SelectRemind(val remindSelection: ChipSelection) : TodosEvent()
   object RestoreTodo : TodosEvent()

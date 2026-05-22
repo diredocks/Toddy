@@ -7,7 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +44,13 @@ fun TaskScreenRoute(
     },
     onRemindSelection = {
       viewModel.onEvent(TaskEvent.SelectRemind(it))
+    },
+    onImportanceClick = {
+      viewModel.onEvent(TaskEvent.ToggleImportance)
+    },
+    onDeleteClick = {
+      viewModel.onEvent(TaskEvent.DeleteTask)
+      onBackClick()
     }
   )
 }
@@ -51,6 +61,8 @@ fun TaskScreen(
   onNavIconClick: () -> Unit = {},
   onDueSelection: (TaskScheduleSelection) -> Unit = {},
   onRemindSelection: (TaskScheduleSelection) -> Unit = {},
+  onImportanceClick: () -> Unit = {},
+  onDeleteClick: () -> Unit = {},
 ) {
   Scaffold(
     topBar = {
@@ -59,6 +71,20 @@ fun TaskScreen(
           IconButton(onClick = onNavIconClick) {
             Icon(
               imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back"
+            )
+          }
+        },
+        actions = {
+          IconButton(onClick = onImportanceClick) {
+            Icon(
+              imageVector = if (state.important) Icons.Default.Star else Icons.Default.StarBorder,
+              contentDescription = if (state.important) "Remove star" else "Add star"
+            )
+          }
+          IconButton(onClick = onDeleteClick) {
+            Icon(
+              imageVector = Icons.Default.DeleteOutline,
+              contentDescription = "Delete task"
             )
           }
         },
@@ -139,6 +165,7 @@ fun TaskScreenPreview() {
     TaskState(
       content = "Programming is hard",
       completed = true,
+      important = true,
       due = LocalDate(2025, 7, 12)
     )
   )

@@ -5,4 +5,6 @@ import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSe
 sealed class TaskEvent {
   data class SelectDue(val dueSelection: TaskScheduleSelection) : TaskEvent()
   data class SelectRemind(val remindSelection: TaskScheduleSelection) : TaskEvent()
+  object ToggleImportance : TaskEvent()
+  object DeleteTask : TaskEvent()
 }

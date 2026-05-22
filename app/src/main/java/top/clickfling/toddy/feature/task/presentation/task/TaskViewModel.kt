@@ -33,6 +33,10 @@ class TaskViewModel @AssistedInject constructor(
 
   fun onEvent(event: TaskEvent) {
     when (event) {
+      TaskEvent.DeleteTask -> {
+        deleteCurrentTask()
+      }
+
       is TaskEvent.SelectDue -> {
         val due = event.dueSelection.toDueDays()
         updateTask { it.copy(due = due) }
@@ -41,6 +45,10 @@ class TaskViewModel @AssistedInject constructor(
       is TaskEvent.SelectRemind -> {
         val remind = event.remindSelection.toRemindTime()
         updateTask { it.copy(remind = remind) }
+      }
+
+      TaskEvent.ToggleImportance -> {
+        updateTask { it.copy(important = !it.important) }
       }
     }
   }
@@ -56,6 +64,7 @@ class TaskViewModel @AssistedInject constructor(
         state = state.copy(
           content = task.content,
           completed = task.completed,
+          important = task.important,
           due = task.due,
           remind = task.remind
         )
@@ -73,11 +82,20 @@ class TaskViewModel @AssistedInject constructor(
         taskUseCases.addTask(updatedTask)
         currentTask = updatedTask
         state = state.copy(
+          important = updatedTask.important,
           due = updatedTask.due,
           remind = updatedTask.remind
         )
       } catch (_: InvalidTaskException) {
       }
+    }
+  }
+
+  private fun deleteCurrentTask() {
+    val task = currentTask ?: return
+
+    viewModelScope.launch {
+      taskUseCases.deleteTask(task)
     }
   }
 

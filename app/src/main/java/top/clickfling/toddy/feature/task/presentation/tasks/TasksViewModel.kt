@@ -16,8 +16,8 @@ import top.clickfling.toddy.feature.task.domain.model.InvalidTaskException
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.domain.useCase.TaskUseCases
 import top.clickfling.toddy.feature.task.domain.util.TaskOrder
-import top.clickfling.toddy.feature.task.presentation.tasks.util.toDueDays
-import top.clickfling.toddy.feature.task.presentation.tasks.util.toRemindTime
+import top.clickfling.toddy.feature.task.presentation.common.util.toDueDays
+import top.clickfling.toddy.feature.task.presentation.common.util.toRemindTime
 import javax.inject.Inject
 import kotlin.time.Clock
 

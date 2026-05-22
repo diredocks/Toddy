@@ -1,17 +1,10 @@
-package top.clickfling.toddy.feature.task.presentation.tasks.components
+package top.clickfling.toddy.feature.task.presentation.task.components
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,16 +18,16 @@ import top.clickfling.toddy.feature.task.presentation.common.components.TaskDate
 import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 
 @Composable
-fun DueChip(
+fun DueActionRow(
   due: LocalDate?,
-  onDueSelection: (TaskScheduleSelection) -> Unit = {},
+  onDueSelection: (TaskScheduleSelection) -> Unit,
 ) {
-  val dueString = remember(due) {
+  val dueText = remember(due) {
     if (due != null) {
       val dayOfWeek = due.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
       val month = due.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
 
-      "$dayOfWeek, $month ${due.day}"
+      "Due $dayOfWeek, $month ${due.day}"
     } else {
       "Set due date"
     }
@@ -42,32 +35,18 @@ fun DueChip(
   var expanded by remember { mutableStateOf(false) }
   var showDatePicker by remember { mutableStateOf(false) }
 
-  Box {
-    InputChip(
-      modifier = Modifier.animateContentSize(),
-      onClick = { expanded = !expanded },
-      label = { Text(dueString) },
-      selected = due != null,
-      leadingIcon = {
-        Icon(
-          imageVector = Icons.Default.CalendarToday,
-          contentDescription = "Due",
-          modifier = Modifier.size(InputChipDefaults.IconSize)
-        )
+  Box(modifier = Modifier.fillMaxWidth()) {
+    TodoActionRow(
+      icon = Icons.Default.AccessTime,
+      text = dueText,
+      trailing = {
+        if (due != null) {
+          ClearButton(onClick = { onDueSelection(TaskScheduleSelection.Clear) })
+        }
       },
-      trailingIcon = {
-        if (due == null) return@InputChip
-        Icon(
-          imageVector = Icons.Default.Close,
-          contentDescription = "Clear due",
-          modifier = Modifier
-            .size(InputChipDefaults.IconSize)
-            .clickable(onClick = { onDueSelection(TaskScheduleSelection.Clear) }),
-        )
-      }
+      onClick = { expanded = true }
     )
 
-    // TODO: Show dayOfWeek in menu items
     DropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },

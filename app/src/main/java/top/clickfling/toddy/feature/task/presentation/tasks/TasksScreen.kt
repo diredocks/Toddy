@@ -46,7 +46,7 @@ import kotlinx.datetime.LocalDate
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
 import top.clickfling.toddy.feature.task.presentation.tasks.components.TaskItem
-import top.clickfling.toddy.feature.task.presentation.tasks.util.ChipSelection
+import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import kotlin.time.Instant
 
 @Composable
@@ -105,8 +105,8 @@ fun TasksScreen(
   onItemCompletedChange: (task: Task) -> Unit = {},
   onItemDelete: (task: Task) -> Unit = {},
   onItemRestore: () -> Unit = {},
-  onDueSelection: (ChipSelection) -> Unit = {},
-  onRemindSelection: (ChipSelection) -> Unit = {},
+  onDueSelection: (TaskScheduleSelection) -> Unit = {},
+  onRemindSelection: (TaskScheduleSelection) -> Unit = {},
   onItemImportanceChange: (task: Task) -> Unit = {},
   onItemClicked: (id: Int?) -> Unit = {},
 ) {

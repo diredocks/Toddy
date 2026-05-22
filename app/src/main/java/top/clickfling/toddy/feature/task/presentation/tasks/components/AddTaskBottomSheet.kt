@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import top.clickfling.toddy.feature.task.presentation.tasks.util.ChipSelection
+import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +30,8 @@ fun AddTaskBottomSheet(
   onContentChange: (String) -> Unit = {},
   onDismissRequest: () -> Unit = {},
   onSaveClick: () -> Unit = {},
-  onDueSelection: (ChipSelection) -> Unit = {},
-  onRemindSelection: (ChipSelection) -> Unit = {},
+  onDueSelection: (TaskScheduleSelection) -> Unit = {},
+  onRemindSelection: (TaskScheduleSelection) -> Unit = {},
 ) {
   val scrollState = rememberScrollState()
   val sheetState = rememberBottomSheetState(SheetValue.Hidden)

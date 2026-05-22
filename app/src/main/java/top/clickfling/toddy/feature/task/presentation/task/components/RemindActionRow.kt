@@ -1,17 +1,10 @@
-package top.clickfling.toddy.feature.task.presentation.tasks.components
+package top.clickfling.toddy.feature.task.presentation.task.components
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,18 +20,14 @@ import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSe
 import kotlin.time.Instant
 
 @Composable
-fun RemindChip(
+fun RemindActionRow(
   remind: Instant?,
-  onRemindSelection: (TaskScheduleSelection) -> Unit = {},
+  onRemindSelection: (TaskScheduleSelection) -> Unit,
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
-  var expanded by remember { mutableStateOf(false) }
-  var showDatePicker by remember { mutableStateOf(false) }
-
-  val chipText = remember(remind) {
+  val remindText = remember(remind) {
     if (remind != null) {
       val localDateTime = remind.toLocalDateTime(currentSystemTimeZone)
-
       val dayOfWeek =
         localDateTime.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
       val month = localDateTime.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
@@ -48,34 +37,25 @@ fun RemindChip(
       "Remind me"
     }
   }
+  var expanded by remember { mutableStateOf(false) }
+  var showDateTimePicker by remember { mutableStateOf(false) }
 
-  Box {
-    InputChip(
-      modifier = Modifier.animateContentSize(),
-      onClick = { expanded = !expanded },
-      label = { Text(chipText) },
-      selected = remind != null,
-      leadingIcon = {
-        Icon(
-          imageVector = Icons.Default.NotificationsNone,
-          contentDescription = "Remind",
-          modifier = Modifier.size(InputChipDefaults.IconSize)
-        )
+  Box(modifier = Modifier.fillMaxWidth()) {
+    TodoActionRow(
+      icon = Icons.Default.NotificationsNone,
+      text = remindText,
+      trailing = {
+        if (remind != null) {
+          ClearButton(onClick = { onRemindSelection(TaskScheduleSelection.Clear) })
+        }
       },
-      trailingIcon = {
-        if (remind == null) return@InputChip
-        Icon(
-          imageVector = Icons.Default.Close,
-          contentDescription = "Clear remind",
-          modifier = Modifier
-            .size(InputChipDefaults.IconSize)
-            .clickable(onClick = { onRemindSelection(TaskScheduleSelection.Clear) }),
-        )
-      })
+      onClick = { expanded = true }
+    )
+
     DropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
-      properties = PopupProperties(focusable = false),
+      properties = PopupProperties(focusable = false)
     ) {
       RemindSelectionMenu(
         onSelect = {
@@ -84,16 +64,16 @@ fun RemindChip(
         },
         onCustomClick = {
           expanded = false
-          showDatePicker = true
+          showDateTimePicker = true
         }
       )
     }
   }
 
-  if (showDatePicker) {
+  if (showDateTimePicker) {
     TaskDateTimePickerDialog(
       initialReminder = remind,
-      onDismissRequest = { showDatePicker = false },
+      onDismissRequest = { showDateTimePicker = false },
       onConfirm = { onRemindSelection(TaskScheduleSelection.Custom(it)) }
     )
   }

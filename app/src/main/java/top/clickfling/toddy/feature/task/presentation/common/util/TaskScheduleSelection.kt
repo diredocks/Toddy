@@ -1,4 +1,4 @@
-package top.clickfling.toddy.feature.task.presentation.tasks.util
+package top.clickfling.toddy.feature.task.presentation.common.util
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -12,32 +12,32 @@ import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-sealed interface ChipSelection {
-  object Today : ChipSelection
-  object Tomorrow : ChipSelection
-  object NextWeek : ChipSelection
-  data class Custom(val timestamp: Instant?) : ChipSelection
-  object Clear : ChipSelection
+sealed interface TaskScheduleSelection {
+  object Today : TaskScheduleSelection
+  object Tomorrow : TaskScheduleSelection
+  object NextWeek : TaskScheduleSelection
+  data class Custom(val timestamp: Instant?) : TaskScheduleSelection
+  object Clear : TaskScheduleSelection
 }
 
-fun ChipSelection.toDueDays(
+fun TaskScheduleSelection.toDueDays(
   clock: Clock = Clock.System,
   timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): LocalDate? {
   val today = clock.todayIn(timeZone)
   return when (this) {
-    ChipSelection.Clear -> null
-    ChipSelection.Today -> today
-    ChipSelection.Tomorrow -> today.plus(1, DateTimeUnit.DAY)
-    ChipSelection.NextWeek -> today.plus(1, DateTimeUnit.WEEK)
-    is ChipSelection.Custom -> {
+    TaskScheduleSelection.Clear -> null
+    TaskScheduleSelection.Today -> today
+    TaskScheduleSelection.Tomorrow -> today.plus(1, DateTimeUnit.DAY)
+    TaskScheduleSelection.NextWeek -> today.plus(1, DateTimeUnit.WEEK)
+    is TaskScheduleSelection.Custom -> {
       if (timestamp == null) return null
       timestamp.toLocalDateTime(timeZone).date
     }
   }
 }
 
-fun ChipSelection.toRemindTime(
+fun TaskScheduleSelection.toRemindTime(
   clock: Clock = Clock.System,
   timeZone: TimeZone = TimeZone.currentSystemDefault(),
   defaultReminderTime: LocalTime = LocalTime(9, 0)
@@ -46,20 +46,20 @@ fun ChipSelection.toRemindTime(
   val now = nowInstant.toLocalDateTime(timeZone)
 
   return when (this) {
-    ChipSelection.Clear -> null
-    ChipSelection.Today -> {
+    TaskScheduleSelection.Clear -> null
+    TaskScheduleSelection.Today -> {
       val threeHoursLater =
         nowInstant.plus(3, DateTimeUnit.HOUR, timeZone).toLocalDateTime(timeZone)
       val sharpTime = LocalTime(threeHoursLater.hour, 0, 0, 0)
       threeHoursLater.date.atTime(sharpTime).toInstant(timeZone)
     }
 
-    ChipSelection.Tomorrow -> now.date.plus(1, DateTimeUnit.DAY).atTime(defaultReminderTime)
-      .toInstant(timeZone)
+    TaskScheduleSelection.Tomorrow ->
+      now.date.plus(1, DateTimeUnit.DAY).atTime(defaultReminderTime).toInstant(timeZone)
 
-    ChipSelection.NextWeek -> now.date.plus(1, DateTimeUnit.WEEK).atTime(defaultReminderTime)
-      .toInstant(timeZone)
+    TaskScheduleSelection.NextWeek ->
+      now.date.plus(1, DateTimeUnit.WEEK).atTime(defaultReminderTime).toInstant(timeZone)
 
-    is ChipSelection.Custom -> this.timestamp
+    is TaskScheduleSelection.Custom -> this.timestamp
   }
 }

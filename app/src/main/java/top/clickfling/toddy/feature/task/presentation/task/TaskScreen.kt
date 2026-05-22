@@ -45,6 +45,9 @@ fun TaskScreenRoute(
     onRemindSelection = {
       viewModel.onEvent(TaskEvent.SelectRemind(it))
     },
+    onCompletedChange = {
+      viewModel.onEvent(TaskEvent.ToggleCompleted)
+    },
     onImportanceClick = {
       viewModel.onEvent(TaskEvent.ToggleImportance)
     },
@@ -61,6 +64,7 @@ fun TaskScreen(
   onNavIconClick: () -> Unit = {},
   onDueSelection: (TaskScheduleSelection) -> Unit = {},
   onRemindSelection: (TaskScheduleSelection) -> Unit = {},
+  onCompletedChange: (Boolean) -> Unit = {},
   onImportanceClick: () -> Unit = {},
   onDeleteClick: () -> Unit = {},
 ) {
@@ -104,7 +108,8 @@ fun TaskScreen(
           text = state.content,
           checked = state.completed,
           style = MaterialTheme.typography.titleLarge,
-          modifier = Modifier.padding(start = 4.dp)
+          modifier = Modifier.padding(start = 4.dp),
+          onCheckedChange = onCompletedChange
         )
 
         TodoCheckItem(

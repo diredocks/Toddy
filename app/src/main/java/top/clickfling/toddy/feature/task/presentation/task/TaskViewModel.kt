@@ -37,6 +37,10 @@ class TaskViewModel @AssistedInject constructor(
         deleteCurrentTask()
       }
 
+      TaskEvent.ToggleCompleted -> {
+        updateTask { it.copy(completed = !it.completed) }
+      }
+
       is TaskEvent.SelectDue -> {
         val due = event.dueSelection.toDueDays()
         updateTask { it.copy(due = due) }
@@ -82,6 +86,7 @@ class TaskViewModel @AssistedInject constructor(
         taskUseCases.addTask(updatedTask)
         currentTask = updatedTask
         state = state.copy(
+          completed = updatedTask.completed,
           important = updatedTask.important,
           due = updatedTask.due,
           remind = updatedTask.remind

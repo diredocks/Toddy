@@ -9,7 +9,7 @@ sealed class TasksEvents {
   data class DeleteTask(val task: Task) : TasksEvents()
   data class EnteredContent(val content: String) : TasksEvents()
   data class ToggleCompleted(val task: Task) : TasksEvents()
-  data class ToggleImportance(val task: Task): TasksEvents()
+  data class ToggleImportance(val task: Task) : TasksEvents()
   data class SelectDue(val dueSelection: ChipSelection) : TasksEvents()
   data class SelectRemind(val remindSelection: ChipSelection) : TasksEvents()
   object RestoreTask : TasksEvents()

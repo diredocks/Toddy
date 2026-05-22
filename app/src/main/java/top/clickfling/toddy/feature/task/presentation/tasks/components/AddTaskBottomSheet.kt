@@ -1,35 +1,19 @@
 package top.clickfling.toddy.feature.task.presentation.tasks.components
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -53,6 +37,19 @@ fun AddTaskBottomSheet(
   val sheetState = rememberBottomSheetState(SheetValue.Hidden)
   val scope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
+  val submit = remember(content, scope, sheetState, onSaveClick) {
+    {
+      if (content.isNotBlank()) {
+        scope.launch {
+          sheetState.hide()
+        }.invokeOnCompletion {
+          if (!sheetState.isVisible) {
+            onSaveClick()
+          }
+        }
+      }
+    }
+  }
 
   LaunchedEffect(sheetState.currentValue) {
     if (sheetState.currentValue == SheetValue.Expanded) {
@@ -61,78 +58,19 @@ fun AddTaskBottomSheet(
   }
 
   ModalBottomSheet(
-    sheetState = sheetState,
-    onDismissRequest = onDismissRequest,
-    dragHandle = {}
-  ) {
+    sheetState = sheetState, onDismissRequest = onDismissRequest, dragHandle = {}) {
     Column(
       modifier = Modifier
         .fillMaxWidth()
         .padding(top = 8.dp, bottom = 16.dp)
     ) {
-      Row(
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        BasicTextField(
-          value = content,
-          onValueChange = onContentChange,
-          modifier = Modifier
-            .focusRequester(focusRequester)
-            .weight(1.0f)
-            .padding(horizontal = 24.dp),
-          textStyle = MaterialTheme.typography.titleLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface
-          ),
-          singleLine = true,
-          keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Send
-          ),
-          keyboardActions = KeyboardActions(
-            onSend = {
-              if (content.isBlank()) return@KeyboardActions
-              scope.launch { sheetState.hide() }.invokeOnCompletion {
-                if (sheetState.isVisible) return@invokeOnCompletion
-                onSaveClick()
-              }
-            }
-          ),
-          // TODO: Same color as IconButton
-          cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-          decorationBox = { innerTextField ->
-            if (content.isBlank()) {
-              Text(
-                text = "New task",
-                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-              )
-            }
-            innerTextField()
-          }
-        )
-        IconButton(
-          enabled = content != "",
-          onClick = {
-            scope.launch { sheetState.hide() }.invokeOnCompletion {
-              if (sheetState.isVisible) return@invokeOnCompletion
-              onSaveClick()
-            }
-          },
-          modifier = Modifier.padding(end = 12.dp)
-        ) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Filled.Send,
-            contentDescription = "Add"
-          )
-        }
-      }
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .horizontalScroll(scrollState)
-          .padding(horizontal = 24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
+      TaskInputBar(
+        content = content,
+        onContentChange = onContentChange,
+        onSubmit = submit,
+        focusRequester = focusRequester
+      )
+      ChipRow {
         ListChip()
         DueChip(due, onDueSelection)
         RemindChip(remind, onRemindSelection)

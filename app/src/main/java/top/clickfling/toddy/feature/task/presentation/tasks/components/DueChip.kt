@@ -41,7 +41,7 @@ fun DueChip(
   onDueSelection: (ChipSelection) -> Unit = {},
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
-  val dateString = remember(due) {
+  val dueString = remember(due) {
     if (due != null) {
       val dayOfWeek = due.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
       val month = due.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
@@ -61,8 +61,8 @@ fun DueChip(
   Box {
     InputChip(
       modifier = Modifier.animateContentSize(),
-      onClick = { expanded = true },
-      label = { Text(dateString) },
+      onClick = { expanded = !expanded },
+      label = { Text(dueString) },
       selected = due != null,
       leadingIcon = {
         Icon(

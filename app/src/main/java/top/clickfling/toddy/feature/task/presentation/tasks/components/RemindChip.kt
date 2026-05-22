@@ -5,11 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowCircleUp
@@ -24,9 +22,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
-import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -116,7 +115,7 @@ fun RemindChip(
   Box {
     InputChip(
       modifier = Modifier.animateContentSize(),
-      onClick = { expanded = true },
+      onClick = { expanded = !expanded },
       label = { Text(chipText) },
       selected = remind != null,
       leadingIcon = {
@@ -204,19 +203,21 @@ fun RemindChip(
           modifier = Modifier
             .clickable(onClick = { showTimePicker = true })
             .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 22.dp),
+            .padding(horizontal = 6.dp),
           verticalAlignment = Alignment.CenterVertically
         ) {
-          Icon(
-            imageVector = Icons.Outlined.AccessTime,
-            contentDescription = "Set time",
-          )
-          Spacer(modifier = Modifier.width(20.dp))
-          SuggestionChip(
-            onClick = { showTimePicker = true },
-            label = { Text(selectedTimeText) }
+          IconButton(onClick = {}) {
+            Icon(
+              imageVector = Icons.Outlined.AccessTime,
+              contentDescription = "Set time",
+            )
+          }
+          Text(
+            text = selectedTimeText,
+            style = MaterialTheme.typography.bodyMedium
           )
         }
+        HorizontalDivider()
       }
     }
   }

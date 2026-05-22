@@ -40,12 +40,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
 import top.clickfling.toddy.feature.task.presentation.tasks.components.TaskItem
 import top.clickfling.toddy.feature.task.presentation.tasks.util.ChipSelection
+import kotlin.time.Instant
 
 @Composable
 fun TasksScreenRoute(
@@ -187,19 +190,10 @@ fun TasksScreen(
             onSwipeEndToStart = {
               onItemDelete(task)
               snackbarJob?.cancel()
-              snackbarJob = scope.launch {
-                snackbarHostState.currentSnackbarData?.dismiss()
-
-                var result = snackbarHostState.showSnackbar(
-                  message = "Task deleted",
-                  actionLabel = "Undo",
-                  duration = SnackbarDuration.Short
-                )
-
-                if (result == SnackbarResult.ActionPerformed) {
-                  onItemRestore()
-                }
-              }
+              snackbarJob = scope.launchDeleteSnackbar(
+                snackbarHostState = snackbarHostState,
+                onRestore = onItemRestore
+              )
             },
             onStarClicked = { onItemImportanceChange(task) }
           )
@@ -228,20 +222,39 @@ fun TasksScreenPreview() {
   TasksScreen(
     state = TasksState(
       tasks = listOf(
-//        Todo(
-//          false,
-//          "blade bird",
-//          0,
-//          171612000L,
-//          id = 0,
-//        ),
-//        Todo(
-//          true,
-//          "choke enough",
-//          0,
-//          id = 1,
-//        ),
+        Task(
+          id = 0,
+          completed = false,
+          important = false,
+          content = "Programming is hard",
+          creation = Instant.fromEpochMilliseconds(0)
+        ),
+        Task(
+          id = 1,
+          completed = true,
+          important = false,
+          content = "Let's go shopping",
+          creation = Instant.fromEpochMilliseconds(0),
+          due = LocalDate(2025, 6, 1)
+        ),
       )
     ),
   )
+}
+
+private fun CoroutineScope.launchDeleteSnackbar(
+  snackbarHostState: SnackbarHostState,
+  onRestore: () -> Unit,
+): Job = launch {
+  snackbarHostState.currentSnackbarData?.dismiss()
+
+  val result = snackbarHostState.showSnackbar(
+    message = "Task deleted",
+    actionLabel = "Undo",
+    duration = SnackbarDuration.Short
+  )
+
+  if (result == SnackbarResult.ActionPerformed) {
+    onRestore()
+  }
 }

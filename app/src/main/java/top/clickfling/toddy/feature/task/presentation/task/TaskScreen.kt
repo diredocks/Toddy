@@ -21,8 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -30,17 +28,16 @@ import top.clickfling.toddy.feature.task.presentation.task.components.AddStepRow
 import top.clickfling.toddy.feature.task.presentation.task.components.ClearButton
 import top.clickfling.toddy.feature.task.presentation.task.components.TodoActionRow
 import top.clickfling.toddy.feature.task.presentation.task.components.TodoCheckItem
-import kotlin.time.Instant
 
 @Composable
 fun TaskScreenRoute(
-  navController: NavController,
-  viewModel: TaskViewModel = hiltViewModel()
+  viewModel: TaskViewModel,
+  onBackClick: () -> Unit,
 ) {
   TaskScreen(
     state = viewModel.state,
     onNavIconClick = {
-      navController.navigateUp()
+      onBackClick()
     },
   )
 }

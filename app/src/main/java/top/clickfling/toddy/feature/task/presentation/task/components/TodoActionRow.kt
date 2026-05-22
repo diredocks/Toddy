@@ -23,7 +23,9 @@ fun TodoActionRow(
   onClick: () -> Unit = {},
 ) {
   Row(
-    modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+    modifier = modifier
+      .fillMaxWidth()
+      .clickable(onClick = onClick),
     verticalAlignment = Alignment.CenterVertically
   ) {
     IconButton(

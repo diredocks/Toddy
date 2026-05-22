@@ -39,7 +39,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -48,12 +47,11 @@ import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
 import top.clickfling.toddy.feature.task.presentation.tasks.components.TaskItem
 import top.clickfling.toddy.feature.task.presentation.tasks.util.ChipSelection
-import top.clickfling.toddy.feature.task.presentation.util.Screen
 import kotlin.time.Instant
 
 @Composable
 fun TasksScreenRoute(
-  navController: NavController,
+  onTaskClick: (Int?) -> Unit,
   viewModel: TasksViewModel = hiltViewModel()
 ) {
   val state = viewModel.state
@@ -91,7 +89,7 @@ fun TasksScreenRoute(
       viewModel.onEvent(TasksEvents.ToggleImportance(it))
     },
     onItemClicked = {
-      navController.navigate(Screen.TaskScreen.route + "?taskId=${it}")
+      onTaskClick(it)
     }
   )
 }

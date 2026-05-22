@@ -6,14 +6,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import top.clickfling.toddy.feature.todo.data.local.TodoDatebase
-import top.clickfling.toddy.feature.todo.data.repository.TodoRepositoryImpl
-import top.clickfling.toddy.feature.todo.domain.repository.TodoRepository
-import top.clickfling.toddy.feature.todo.domain.useCase.AddTodo
-import top.clickfling.toddy.feature.todo.domain.useCase.DeleteTodo
-import top.clickfling.toddy.feature.todo.domain.useCase.GetTodo
-import top.clickfling.toddy.feature.todo.domain.useCase.GetTodos
-import top.clickfling.toddy.feature.todo.domain.useCase.TodoUseCases
+import top.clickfling.toddy.feature.task.data.local.TaskDatabase
+import top.clickfling.toddy.feature.task.data.repository.TaskRepositoryImpl
+import top.clickfling.toddy.feature.task.domain.repository.TaskRepository
+import top.clickfling.toddy.feature.task.domain.useCase.AddTask
+import top.clickfling.toddy.feature.task.domain.useCase.DeleteTask
+import top.clickfling.toddy.feature.task.domain.useCase.GetTask
+import top.clickfling.toddy.feature.task.domain.useCase.GetTasks
+import top.clickfling.toddy.feature.task.domain.useCase.TaskUseCases
 import javax.inject.Singleton
 
 @Module
@@ -21,28 +21,28 @@ import javax.inject.Singleton
 object AppModule {
   @Provides
   @Singleton
-  fun provideTodoDatabase(app: Application): TodoDatebase {
+  fun provideTaskDatabase(app: Application): TaskDatabase {
     return Room.databaseBuilder(
       app,
-      TodoDatebase::class.java,
-      TodoDatebase.DATABASE_NAME
+      TaskDatabase::class.java,
+      TaskDatabase.DATABASE_NAME
     ).build()
   }
 
   @Provides
   @Singleton
-  fun provideTodoRepository(db: TodoDatebase): TodoRepository {
-    return TodoRepositoryImpl(db.todoDao)
+  fun provideTaskRepository(db: TaskDatabase): TaskRepository {
+    return TaskRepositoryImpl(db.taskDao)
   }
 
   @Provides
   @Singleton
-  fun provideTodoUseCases(repository: TodoRepository): TodoUseCases {
-    return TodoUseCases(
-      getTodo = GetTodo(repository),
-      getTodos = GetTodos(repository),
-      addTodo = AddTodo(repository),
-      deleteTodo = DeleteTodo(repository)
+  fun provideTaskUseCases(repository: TaskRepository): TaskUseCases {
+    return TaskUseCases(
+      getTask = GetTask(repository),
+      getTasks = GetTasks(repository),
+      addTask = AddTask(repository),
+      deleteTask = DeleteTask(repository)
     )
   }
 }

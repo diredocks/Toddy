@@ -1,0 +1,17 @@
+package top.clickfling.toddy.feature.task.data.local
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
+
+@Entity
+data class TaskEntity(
+  val completed: Boolean = false,
+  val important: Boolean = false,
+  val content: String,
+  val creation: Instant,
+  val due: LocalDate? = null,
+  val remind: Instant? = null,
+  @PrimaryKey val id: Int? = null,
+)

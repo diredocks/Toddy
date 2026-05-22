@@ -10,8 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import top.clickfling.toddy.feature.todo.presentation.todos.TodosScreenRoute
-import top.clickfling.toddy.feature.todo.presentation.util.Screen
+import top.clickfling.toddy.feature.task.presentation.tasks.TasksScreenRoute
+import top.clickfling.toddy.feature.task.presentation.util.Screen
 import top.clickfling.toddy.ui.theme.ToddyTheme
 
 @AndroidEntryPoint
@@ -27,10 +27,10 @@ class MainActivity : ComponentActivity() {
           val navController = rememberNavController()
           NavHost(
             navController = navController,
-            startDestination = Screen.TodosScreen.route
+            startDestination = Screen.TasksScreen.route
           ) {
-            composable(route = Screen.TodosScreen.route) {
-              TodosScreenRoute(navController = navController)
+            composable(route = Screen.TasksScreen.route) {
+              TasksScreenRoute(navController = navController)
             }
           }
         }

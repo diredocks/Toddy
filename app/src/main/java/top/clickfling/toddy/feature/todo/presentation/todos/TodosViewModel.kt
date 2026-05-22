@@ -90,7 +90,7 @@ class TodosViewModel @Inject constructor(
       TodosEvent.ToggleSheetVisibility -> {
         state = state.copy(
           showSheet = !state.showSheet,
-          due = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays(),
+          due = Clock.System.todayIn(TimeZone.currentSystemDefault()),
           remind = null,
           content = "",
         )
@@ -105,7 +105,7 @@ class TodosViewModel @Inject constructor(
                 due = state.due,
                 remind = state.remind,
                 completed = false,
-                creation = Clock.System.now().epochSeconds,
+                creation = Clock.System.now(),
               )
             )
             state = state.copy(showSheet = !state.showSheet)

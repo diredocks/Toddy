@@ -55,7 +55,7 @@ import kotlin.time.Instant
 // TODO: Sync picker and remind?
 @Composable
 fun RemindChip(
-  remind: Long?,
+  remind: Instant?,
   onRemindSelection: (ChipSelection) -> Unit = {},
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
@@ -70,19 +70,24 @@ fun RemindChip(
     initialHour = (Clock.System.now().toLocalDateTime(currentSystemTimeZone).hour + 1) % 24
   )
 
-  val combinedSelectedMillis by remember {
+  val combinedSelectedInstant by remember {
     derivedStateOf {
-      val dateMillis = datePickerState.selectedDateMillis ?: return@derivedStateOf null
-      val localDate = Instant.fromEpochMilliseconds(dateMillis).toLocalDateTime(TimeZone.UTC).date
-      val localDateTime = LocalDateTime(
+      val dateMillis =
+        datePickerState.selectedDateMillis
+          ?: return@derivedStateOf null
+
+      val localDate =
+        Instant.fromEpochMilliseconds(dateMillis)
+          .toLocalDateTime(TimeZone.UTC)
+          .date
+
+      LocalDateTime(
         year = localDate.year,
         month = localDate.month.number,
         day = localDate.day,
         hour = timePickerState.hour,
         minute = timePickerState.minute,
-      )
-
-      localDateTime.toInstant(currentSystemTimeZone).toEpochMilliseconds()
+      ).toInstant(currentSystemTimeZone)
     }
   }
 
@@ -92,10 +97,10 @@ fun RemindChip(
     "$hour:$minute"
   }
 
+
   val chipText = remember(remind) {
     if (remind != null) {
-      val instant = Instant.fromEpochMilliseconds(remind)
-      val localDateTime = instant.toLocalDateTime(currentSystemTimeZone)
+      val localDateTime = remind.toLocalDateTime(currentSystemTimeZone)
 
       val dayOfWeek =
         localDateTime.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
@@ -167,7 +172,11 @@ fun RemindChip(
   if (showDatePicker) {
     DatePickerDialog(onDismissRequest = { showDatePicker = false }, confirmButton = {
       TextButton(onClick = {
-        combinedSelectedMillis?.let { onRemindSelection(ChipSelection.Custom(it)) }
+        combinedSelectedInstant?.let {
+          onRemindSelection(
+            ChipSelection.Custom(it)
+          )
+        }
         showDatePicker = false
       }) {
         Text("OK")

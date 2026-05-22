@@ -1,11 +1,14 @@
 package top.clickfling.toddy.feature.todo.domain.model
 
+import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
+
 data class Todo(
   val completed: Boolean = false,
   val content: String,
-  val creation: Long,
-  val due: Long? = null,
-  val remind: Long? = null,
+  val creation: Instant,
+  val due: LocalDate? = null,
+  val remind: Instant? = null,
   val id: Int? = null,
 )
 

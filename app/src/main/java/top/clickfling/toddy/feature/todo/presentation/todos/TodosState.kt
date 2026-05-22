@@ -1,7 +1,9 @@
 package top.clickfling.toddy.feature.todo.presentation.todos
 
+import kotlinx.datetime.LocalDate
 import top.clickfling.toddy.feature.todo.domain.model.Todo
 import top.clickfling.toddy.feature.todo.domain.util.TodoOrder
+import kotlin.time.Instant
 
 data class TodosState(
   val todos: List<Todo> = emptyList(),
@@ -11,6 +13,6 @@ data class TodosState(
   val showSheet: Boolean = false,
   // new item related states
   val content: String = "",
-  val due: Long? = null,
-  val remind: Long? = null,
+  val due: LocalDate? = null,
+  val remind: Instant? = null,
 )

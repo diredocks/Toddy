@@ -32,21 +32,20 @@ import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import top.clickfling.toddy.feature.todo.presentation.todos.util.ChipSelection
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 fun DueChip(
-  due: Long?,
+  due: LocalDate?,
   onDueSelection: (ChipSelection) -> Unit = {}
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
   val dateString = remember(due) {
     if (due != null) {
-      val localDate = LocalDate.fromEpochDays(due)
+      val dayOfWeek = due.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+      val month = due.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
 
-      val dayOfWeek = localDate.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-      val month = localDate.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-
-      "$dayOfWeek, $month ${localDate.day}"
+      "$dayOfWeek, $month ${due.day}"
     } else {
       "Set due date"
     }
@@ -138,7 +137,11 @@ fun DueChip(
       onDismissRequest = { showDatePicker = false },
       confirmButton = {
         TextButton(onClick = {
-          onDueSelection(ChipSelection.Custom(datePickerState.selectedDateMillis))
+          datePickerState.selectedDateMillis
+            ?.let(Instant::fromEpochMilliseconds)
+            ?.let {
+              onDueSelection(ChipSelection.Custom(it))
+            }
           showDatePicker = false
         }) {
           Text("OK")

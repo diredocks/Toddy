@@ -222,19 +222,19 @@ fun TodosScreenPreview() {
   TodosScreen(
     state = TodosState(
       todos = listOf(
-        Todo(
-          false,
-          "blade bird",
-          0,
-          171612000L,
-          id = 0,
-        ),
-        Todo(
-          true,
-          "choke enough",
-          0,
-          id = 1,
-        ),
+//        Todo(
+//          false,
+//          "blade bird",
+//          0,
+//          171612000L,
+//          id = 0,
+//        ),
+//        Todo(
+//          true,
+//          "choke enough",
+//          0,
+//          id = 1,
+//        ),
       )
     ),
   )

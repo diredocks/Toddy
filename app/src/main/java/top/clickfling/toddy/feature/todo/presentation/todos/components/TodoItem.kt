@@ -45,27 +45,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlin.math.abs
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TodoItem(
   content: String,
   completed: Boolean,
-  due: Long? = null,
-  remind: Long? = null,
+  due: LocalDate? = null,
+  remind: Instant? = null,
   onCheckedChange: (Boolean) -> Unit = {},
   onSwipeEndToStart: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
+  val currentSystemTimeZone = remember {
+    TimeZone.currentSystemDefault()
+  }
+
   val dateString = remember(due) {
-    due?.let {
-      val localDate = LocalDate.fromEpochDays(it)
-      val dayOfWeek = localDate.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-      val month = localDate.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+    due?.let { localDate ->
+      val dayOfWeek =
+        localDate.dayOfWeek.name.lowercase()
+          .replaceFirstChar { c -> c.uppercase() }
+
+      val month =
+        localDate.month.name.lowercase()
+          .replaceFirstChar { c -> c.uppercase() }
+
       "$dayOfWeek, $month ${localDate.day}"
     }
   }
+
   val dismissState = rememberSwipeToDismissBoxState()
   val scope = rememberCoroutineScope()
 
@@ -141,6 +153,7 @@ fun TodoItem(
         )
       },
       supportingContent = {
+        // TODO: Highlighting colors on special states
         Row(
           verticalAlignment = Alignment.CenterVertically
         ) {
@@ -202,9 +215,9 @@ fun TodoItem(
 @Composable
 fun TodoItemPreview() {
   Column {
-    TodoItem("Adam met Karl", false, 171612000L)
+    TodoItem("Adam met Karl", false, LocalDate(2023, 1 ,3))
     Spacer(modifier = Modifier.height(8.dp))
-    TodoItem("Alice met Bob", true, 171642000L, remind = 0)
+    TodoItem("Alice met Bob", true, LocalDate(2023, 4 ,5), Instant.fromEpochMilliseconds(0))
     Spacer(modifier = Modifier.height(8.dp))
     TodoItem("Xiaoping met Elihu", true)
   }

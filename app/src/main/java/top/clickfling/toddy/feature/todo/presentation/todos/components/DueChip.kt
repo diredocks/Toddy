@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.PopupProperties
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
@@ -37,7 +38,7 @@ import kotlin.time.Instant
 @Composable
 fun DueChip(
   due: LocalDate?,
-  onDueSelection: (ChipSelection) -> Unit = {}
+  onDueSelection: (ChipSelection) -> Unit = {},
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
   val dateString = remember(due) {
@@ -85,7 +86,8 @@ fun DueChip(
     // TODO: Show dayOfWeek in menu items
     DropdownMenu(
       expanded = expanded,
-      onDismissRequest = { expanded = false }
+      onDismissRequest = { expanded = false },
+      properties = PopupProperties(focusable = false)
     ) {
       DropdownMenuItem(
         text = { Text("Today") },

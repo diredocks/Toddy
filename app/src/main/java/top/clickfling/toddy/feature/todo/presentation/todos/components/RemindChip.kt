@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
@@ -136,7 +137,10 @@ fun RemindChip(
         )
       })
     DropdownMenu(
-      expanded = expanded, onDismissRequest = { expanded = false }) {
+      expanded = expanded,
+      onDismissRequest = { expanded = false },
+      properties = PopupProperties(focusable = false),
+    ) {
       DropdownMenuItem(
         text = { Text("Later today") },
         leadingIcon = { Icon(Icons.Default.Timelapse, contentDescription = "Later today") },

@@ -21,9 +21,13 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +52,13 @@ fun AddTodoBottomSheet(
   val scrollState = rememberScrollState()
   val sheetState = rememberBottomSheetState(SheetValue.Hidden)
   val scope = rememberCoroutineScope()
+  val focusRequester = remember { FocusRequester() }
+
+  LaunchedEffect(sheetState.currentValue) {
+    if (sheetState.currentValue == SheetValue.Expanded) {
+      focusRequester.requestFocus()
+    }
+  }
 
   ModalBottomSheet(
     sheetState = sheetState,
@@ -66,6 +77,7 @@ fun AddTodoBottomSheet(
           value = content,
           onValueChange = onContentChange,
           modifier = Modifier
+            .focusRequester(focusRequester)
             .weight(1.0f)
             .padding(horizontal = 24.dp),
           textStyle = MaterialTheme.typography.titleLarge.copy(
@@ -93,9 +105,8 @@ fun AddTodoBottomSheet(
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
               )
-            } else {
-              innerTextField()
             }
+            innerTextField()
           }
         )
         IconButton(

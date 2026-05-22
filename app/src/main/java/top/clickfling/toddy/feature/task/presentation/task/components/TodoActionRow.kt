@@ -2,6 +2,7 @@ package top.clickfling.toddy.feature.task.presentation.task.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -21,6 +22,13 @@ fun TodoActionRow(
   modifier: Modifier = Modifier,
   trailing: (@Composable () -> Unit)? = null,
   onClick: () -> Unit = {},
+  textContent: @Composable RowScope.(Modifier) -> Unit = { textModifier ->
+    Text(
+      text = text,
+      style = MaterialTheme.typography.bodyLarge,
+      modifier = textModifier
+    )
+  },
 ) {
   Row(
     modifier = modifier
@@ -38,11 +46,7 @@ fun TodoActionRow(
       )
     }
 
-    Text(
-      text = text,
-      style = MaterialTheme.typography.bodyLarge,
-      modifier = Modifier.weight(1f)
-    )
+    textContent(Modifier.weight(1f))
 
     trailing?.invoke()
   }

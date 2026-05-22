@@ -1,10 +1,11 @@
 package top.clickfling.toddy.feature.task.presentation.task.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,35 +41,40 @@ fun RemindActionRow(
   var expanded by remember { mutableStateOf(false) }
   var showDateTimePicker by remember { mutableStateOf(false) }
 
-  Box(modifier = Modifier.fillMaxWidth()) {
-    TodoActionRow(
-      icon = Icons.Default.NotificationsNone,
-      text = remindText,
-      trailing = {
-        if (remind != null) {
-          ClearButton(onClick = { onRemindSelection(TaskScheduleSelection.Clear) })
+  TodoActionRow(
+    icon = Icons.Default.NotificationsNone,
+    text = remindText,
+    trailing = {
+      if (remind != null) {
+        ClearButton(onClick = { onRemindSelection(TaskScheduleSelection.Clear) })
+      }
+    },
+    onClick = { expanded = true },
+    textContent = { modifier ->
+      Box(modifier = modifier) {
+        Text(
+          text = remindText,
+          style = MaterialTheme.typography.bodyLarge,
+        )
+        DropdownMenu(
+          expanded = expanded,
+          onDismissRequest = { expanded = false },
+          properties = PopupProperties(focusable = false)
+        ) {
+          RemindSelectionMenu(
+            onSelect = {
+              expanded = false
+              onRemindSelection(it)
+            },
+            onCustomClick = {
+              expanded = false
+              showDateTimePicker = true
+            }
+          )
         }
-      },
-      onClick = { expanded = true }
-    )
-
-    DropdownMenu(
-      expanded = expanded,
-      onDismissRequest = { expanded = false },
-      properties = PopupProperties(focusable = false)
-    ) {
-      RemindSelectionMenu(
-        onSelect = {
-          expanded = false
-          onRemindSelection(it)
-        },
-        onCustomClick = {
-          expanded = false
-          showDateTimePicker = true
-        }
-      )
+      }
     }
-  }
+  )
 
   if (showDateTimePicker) {
     TaskDateTimePickerDialog(

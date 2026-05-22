@@ -1,10 +1,11 @@
 package top.clickfling.toddy.feature.task.presentation.task.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,35 +36,40 @@ fun DueActionRow(
   var expanded by remember { mutableStateOf(false) }
   var showDatePicker by remember { mutableStateOf(false) }
 
-  Box(modifier = Modifier.fillMaxWidth()) {
-    TodoActionRow(
-      icon = Icons.Default.AccessTime,
-      text = dueText,
-      trailing = {
-        if (due != null) {
-          ClearButton(onClick = { onDueSelection(TaskScheduleSelection.Clear) })
+  TodoActionRow(
+    icon = Icons.Default.AccessTime,
+    text = dueText,
+    trailing = {
+      if (due != null) {
+        ClearButton(onClick = { onDueSelection(TaskScheduleSelection.Clear) })
+      }
+    },
+    onClick = { expanded = true },
+    textContent = { modifier ->
+      Box(modifier = modifier) {
+        Text(
+          text = dueText,
+          style = MaterialTheme.typography.bodyLarge,
+        )
+        DropdownMenu(
+          expanded = expanded,
+          onDismissRequest = { expanded = false },
+          properties = PopupProperties(focusable = false)
+        ) {
+          DueSelectionMenu(
+            onSelect = {
+              expanded = false
+              onDueSelection(it)
+            },
+            onCustomClick = {
+              expanded = false
+              showDatePicker = true
+            }
+          )
         }
-      },
-      onClick = { expanded = true }
-    )
-
-    DropdownMenu(
-      expanded = expanded,
-      onDismissRequest = { expanded = false },
-      properties = PopupProperties(focusable = false)
-    ) {
-      DueSelectionMenu(
-        onSelect = {
-          expanded = false
-          onDueSelection(it)
-        },
-        onCustomClick = {
-          expanded = false
-          showDatePicker = true
-        }
-      )
+      }
     }
-  }
+  )
 
   if (showDatePicker) {
     TaskDatePickerDialog(

@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -69,26 +72,38 @@ fun AddTodoBottomSheet(
             color = MaterialTheme.colorScheme.onSurface
           ),
           singleLine = true,
+          keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Send
+          ),
+          keyboardActions = KeyboardActions(
+            onSend = {
+              if (content.isBlank()) return@KeyboardActions
+              scope.launch { sheetState.hide() }.invokeOnCompletion {
+                if (sheetState.isVisible) return@invokeOnCompletion
+                onSaveClick()
+              }
+            }
+          ),
           // TODO: Same color as IconButton
           cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
           decorationBox = { innerTextField ->
-            if (content.isEmpty()) {
+            if (content.isBlank()) {
               Text(
                 text = "New task",
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
               )
+            } else {
+              innerTextField()
             }
-            innerTextField()
           }
         )
         IconButton(
           enabled = content != "",
           onClick = {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
-              if (!sheetState.isVisible) {
-                onSaveClick()
-              }
+              if (sheetState.isVisible) return@invokeOnCompletion
+              onSaveClick()
             }
           },
           modifier = Modifier.padding(end = 12.dp)

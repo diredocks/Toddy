@@ -48,6 +48,7 @@ import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
 import top.clickfling.toddy.feature.task.presentation.tasks.components.TaskItem
 import top.clickfling.toddy.feature.task.presentation.tasks.util.ChipSelection
+import top.clickfling.toddy.feature.task.presentation.util.Screen
 import kotlin.time.Instant
 
 @Composable
@@ -88,6 +89,9 @@ fun TasksScreenRoute(
     },
     onItemImportanceChange = {
       viewModel.onEvent(TasksEvents.ToggleImportance(it))
+    },
+    onItemClicked = {
+      navController.navigate(Screen.TaskScreen.route + "?taskId=${it}")
     }
   )
 }
@@ -106,6 +110,7 @@ fun TasksScreen(
   onDueSelection: (ChipSelection) -> Unit = {},
   onRemindSelection: (ChipSelection) -> Unit = {},
   onItemImportanceChange: (task: Task) -> Unit = {},
+  onItemClicked: (id: Int?) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -195,7 +200,8 @@ fun TasksScreen(
                 onRestore = onItemRestore
               )
             },
-            onStarClicked = { onItemImportanceChange(task) }
+            onStarClicked = { onItemImportanceChange(task) },
+            onItemClicked = { onItemClicked(task.id) },
           )
         }
       }

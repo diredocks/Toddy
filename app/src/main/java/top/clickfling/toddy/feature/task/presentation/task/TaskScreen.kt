@@ -21,6 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavController
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -31,16 +33,27 @@ import top.clickfling.toddy.feature.task.presentation.task.components.TodoCheckI
 import kotlin.time.Instant
 
 @Composable
+fun TaskScreenRoute(
+  navController: NavController,
+  viewModel: TaskViewModel = hiltViewModel()
+) {
+  TaskScreen(
+    state = viewModel.state,
+    onNavIconClick = {
+      navController.navigateUp()
+    },
+  )
+}
+
+@Composable
 fun TaskScreen(
-  content: String,
-  completed: Boolean,
-  due: LocalDate? = null,
-  remind: Instant? = null,
+  state: TaskState,
+  onNavIconClick: () -> Unit = {},
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
-  val remindText = remember(remind) {
-    if (remind != null) {
-      val localDateTime = remind.toLocalDateTime(currentSystemTimeZone)
+  val remindText = remember(state.remind) {
+    if (state.remind != null) {
+      val localDateTime = state.remind.toLocalDateTime(currentSystemTimeZone)
 
       val dayOfWeek =
         localDateTime.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
@@ -51,12 +64,12 @@ fun TaskScreen(
       "Remind me"
     }
   }
-  val dueString = remember(due) {
-    if (due != null) {
-      val dayOfWeek = due.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
-      val month = due.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+  val dueString = remember(state.due) {
+    if (state.due != null) {
+      val dayOfWeek = state.due.dayOfWeek.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+      val month = state.due.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
 
-      "Due $dayOfWeek, $month ${due.day}"
+      "Due $dayOfWeek, $month ${state.due.day}"
     } else {
       "Set due date"
     }
@@ -66,7 +79,7 @@ fun TaskScreen(
     topBar = {
       TopAppBar(
         navigationIcon = {
-          IconButton(onClick = {}) {
+          IconButton(onClick = onNavIconClick) {
             Icon(
               imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back"
             )
@@ -85,8 +98,8 @@ fun TaskScreen(
       ) {
 
         TodoCheckItem(
-          text = content,
-          checked = completed,
+          text = state.content,
+          checked = state.completed,
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 4.dp)
         )
@@ -114,7 +127,7 @@ fun TaskScreen(
         icon = Icons.Default.NotificationsNone,
         text = remindText,
         trailing = {
-          if (remind != null) {
+          if (state.remind != null) {
             ClearButton()
           }
         }
@@ -124,7 +137,7 @@ fun TaskScreen(
         icon = Icons.Default.AccessTime,
         text = dueString,
         trailing = {
-          if (due != null) {
+          if (state.due != null) {
             ClearButton()
           }
         }
@@ -156,8 +169,10 @@ fun TaskScreen(
 @Composable
 fun TaskScreenPreview() {
   TaskScreen(
-    content = "Programming is hard",
-    completed = true,
-    due = LocalDate(2025, 7, 12)
+    TaskState(
+      content = "Programming is hard",
+      completed = true,
+      due = LocalDate(2025, 7, 12)
+    )
   )
 }

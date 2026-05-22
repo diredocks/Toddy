@@ -40,6 +40,7 @@ fun TaskItem(
   onCheckedChange: (Boolean) -> Unit = {},
   onSwipeEndToStart: () -> Unit = {},
   onStarClicked: () -> Unit = {},
+  onItemClicked: () -> Unit = {},
 ) {
   val dismissState = rememberSwipeToDismissBoxState()
   val scope = rememberCoroutineScope()
@@ -69,7 +70,7 @@ fun TaskItem(
     }) {
     ListItem(
       selected = completed,
-      onClick = {},
+      onClick = onItemClicked,
       leadingContent = { Checkbox(checked = completed, onCheckedChange = onCheckedChange) },
       trailingContent = {
         IconButton(

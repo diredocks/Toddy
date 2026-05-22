@@ -6,7 +6,7 @@ import top.clickfling.toddy.feature.task.domain.repository.TaskRepository
 class GetTask(
   private val repository: TaskRepository
 ) {
-  suspend operator fun invoke(task: Task) {
-    repository.deleteTask(task)
+  suspend operator fun invoke(id: Int): Task? {
+    return repository.getTaskById(id)
   }
 }

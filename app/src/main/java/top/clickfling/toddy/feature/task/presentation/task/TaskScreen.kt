@@ -70,7 +70,7 @@ fun TaskScreen(
   onNavIconClick: () -> Unit = {},
   onDueSelection: (TaskScheduleSelection) -> Unit = {},
   onRemindSelection: (TaskScheduleSelection) -> Unit = {},
-  onCompletedChange: (Boolean) -> Unit = {},
+  onCompletedChange: () -> Unit = {},
   onImportanceClick: () -> Unit = {},
   onDeleteClick: (Task) -> Unit = {},
 ) {
@@ -114,7 +114,7 @@ fun TaskScreen(
           text = state.task.content,
           checked = state.task.completed,
           style = MaterialTheme.typography.titleLarge,
-          modifier = Modifier.padding(start = 4.dp),
+          modifier = Modifier.padding(start = 4.dp, end = 6.dp),
           onCheckedChange = onCompletedChange
         )
 

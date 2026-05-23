@@ -22,7 +22,8 @@ fun TaskDatePickerDialog(
 ) {
   val currentSystemTimeZone = remember { TimeZone.currentSystemDefault() }
   val datePickerState = rememberDatePickerState(
-    initialSelectedDate = (initialDate ?: Clock.System.now().toLocalDateTime(currentSystemTimeZone).date)
+    initialSelectedDate = (initialDate ?: Clock.System.now()
+      .toLocalDateTime(currentSystemTimeZone).date)
       .toJavaLocalDate()
   )
 

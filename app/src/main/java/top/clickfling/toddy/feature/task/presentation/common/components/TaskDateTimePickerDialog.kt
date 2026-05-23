@@ -73,7 +73,9 @@ fun TaskDateTimePickerDialog(
   }
 
   val selectedTimeText = remember(timePickerState.hour, timePickerState.minute) {
-    "${timePickerState.hour.toString().padStart(2, '0')}:${timePickerState.minute.toString().padStart(2, '0')}"
+    "${timePickerState.hour.toString().padStart(2, '0')}:${
+      timePickerState.minute.toString().padStart(2, '0')
+    }"
   }
 
   DatePickerDialog(

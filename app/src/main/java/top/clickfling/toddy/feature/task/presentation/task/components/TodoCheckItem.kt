@@ -18,7 +18,7 @@ fun TodoCheckItem(
   checked: Boolean,
   style: TextStyle,
   modifier: Modifier = Modifier,
-  onCheckedChange: (Boolean) -> Unit = {},
+  onCheckedChange: () -> Unit = {},
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -26,7 +26,7 @@ fun TodoCheckItem(
   ) {
     Checkbox(
       checked = checked,
-      onCheckedChange = onCheckedChange
+      onCheckedChange = { onCheckedChange() }
     )
 
     Text(

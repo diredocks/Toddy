@@ -52,6 +52,12 @@ class TaskViewModel @AssistedInject constructor(
       TaskEvent.ToggleImportance -> {
         updateTask { it.copy(important = !it.important) }
       }
+
+      is TaskEvent.OnContentChange -> {
+        if (event.content.isNotBlank()) {
+          updateTask { it.copy(content = event.content) }
+        }
+      }
     }
   }
 

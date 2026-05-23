@@ -8,4 +8,5 @@ sealed class TaskEvent {
   object DeleteTask : TaskEvent()
   object ToggleCompleted : TaskEvent()
   object ToggleImportance : TaskEvent()
+  data class OnContentChange(val content: String) : TaskEvent()
 }

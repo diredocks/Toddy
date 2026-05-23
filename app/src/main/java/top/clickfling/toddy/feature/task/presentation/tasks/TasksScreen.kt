@@ -29,32 +29,34 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import androidx.navigation3.runtime.result.LocalResultEventBus
 import kotlinx.datetime.LocalDate
 import top.clickfling.toddy.feature.task.domain.model.Task
+import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
 import top.clickfling.toddy.feature.task.presentation.tasks.components.TaskItem
-import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import kotlin.time.Instant
 
 @Composable
 fun TasksScreenRoute(
   onTaskClick: (Int?) -> Unit,
-  viewModel: TasksViewModel = hiltViewModel()
+  viewModel: TasksViewModel = hiltViewModel(),
 ) {
   val state = viewModel.state
+  val resultStore = LocalResultEventBus.current.conflateAsState<Task?>(null)
+  LaunchedEffect(resultStore.value) {
+    val task = resultStore.value ?: return@LaunchedEffect
+    viewModel.onEvent(
+      TasksEvents.StoreRecentlyDeletedTask(task)
+    )
+  }
 
   TasksScreen(
     state = state,
@@ -88,7 +90,11 @@ fun TasksScreenRoute(
     onItemImportanceChange = {
       viewModel.onEvent(TasksEvents.ToggleImportance(it))
     },
+    onSnackbarDismissed = {
+      viewModel.onEvent(TasksEvents.DeleteRecentlyDeletedTask)
+    },
     onItemClicked = {
+      viewModel.onEvent(TasksEvents.DeleteRecentlyDeletedTask)
       onTaskClick(it)
     }
   )
@@ -109,19 +115,33 @@ fun TasksScreen(
   onRemindSelection: (TaskScheduleSelection) -> Unit = {},
   onItemImportanceChange: (task: Task) -> Unit = {},
   onItemClicked: (id: Int?) -> Unit = {},
+  onSnackbarDismissed: () -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-  val scope = rememberCoroutineScope()
-  var snackbarJob by remember { mutableStateOf<Job?>(null) }
+
+  LaunchedEffect(state.recentlyDeletedTask) {
+    if (state.recentlyDeletedTask == null) return@LaunchedEffect
+    snackbarHostState.currentSnackbarData?.dismiss()
+
+    when (snackbarHostState.showSnackbar(
+      message = "Task deleted", actionLabel = "Undo", duration = SnackbarDuration.Short
+    )) {
+      SnackbarResult.ActionPerformed -> {
+        onItemRestore()
+      }
+
+      SnackbarResult.Dismissed -> {
+        onSnackbarDismissed()
+      }
+    }
+  }
 
   Scaffold(
     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {
       MediumTopAppBar(
-        title = {
-          Text("Planned")
-        },
+        title = { Text("Planned") },
         navigationIcon = {
           IconButton(onClick = {}) {
             Icon(
@@ -155,7 +175,6 @@ fun TasksScreen(
     ) {
 
       LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
       ) {
@@ -166,9 +185,7 @@ fun TasksScreen(
           ) {
             FilterChip(
               onClick = {},
-              label = {
-                Text("All Planned")
-              },
+              label = { Text("All Planned") },
               selected = state.beforeTimestamp != null,
               leadingIcon = {
                 Icon(
@@ -176,12 +193,11 @@ fun TasksScreen(
                   contentDescription = "Filter",
                   modifier = Modifier.size(FilterChipDefaults.IconSize)
                 )
-              }
-            )
+              })
           }
         }
 
-        items(state.tasks, key = { it.id!! }) { task ->
+        items(items = state.tasks, key = { it.id!! }) { task ->
           TaskItem(
             content = task.content,
             due = task.due,
@@ -190,14 +206,7 @@ fun TasksScreen(
             completed = task.completed,
             modifier = Modifier.animateItem(),
             onCheckedChange = { onItemCompletedChange(task) },
-            onSwipeEndToStart = {
-              onItemDelete(task)
-              snackbarJob?.cancel()
-              snackbarJob = scope.launchDeleteSnackbar(
-                snackbarHostState = snackbarHostState,
-                onRestore = onItemRestore
-              )
-            },
+            onSwipeEndToStart = { onItemDelete(task) },
             onStarClicked = { onItemImportanceChange(task) },
             onItemClicked = { onItemClicked(task.id) },
           )
@@ -244,21 +253,4 @@ fun TasksScreenPreview() {
       )
     ),
   )
-}
-
-private fun CoroutineScope.launchDeleteSnackbar(
-  snackbarHostState: SnackbarHostState,
-  onRestore: () -> Unit,
-): Job = launch {
-  snackbarHostState.currentSnackbarData?.dismiss()
-
-  val result = snackbarHostState.showSnackbar(
-    message = "Task deleted",
-    actionLabel = "Undo",
-    duration = SnackbarDuration.Short
-  )
-
-  if (result == SnackbarResult.ActionPerformed) {
-    onRestore()
-  }
 }

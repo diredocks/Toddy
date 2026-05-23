@@ -21,19 +21,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.result.LocalResultEventBus
 import kotlinx.datetime.LocalDate
+import top.clickfling.toddy.feature.task.domain.model.Task
+import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import top.clickfling.toddy.feature.task.presentation.task.components.AddStepRow
 import top.clickfling.toddy.feature.task.presentation.task.components.DueActionRow
 import top.clickfling.toddy.feature.task.presentation.task.components.RemindActionRow
 import top.clickfling.toddy.feature.task.presentation.task.components.TodoActionRow
 import top.clickfling.toddy.feature.task.presentation.task.components.TodoCheckItem
-import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
+import kotlin.time.Instant
 
 @Composable
 fun TaskScreenRoute(
   viewModel: TaskViewModel,
   onBackClick: () -> Unit,
 ) {
+  val resultBus = LocalResultEventBus.current
+
   TaskScreen(
     state = viewModel.state,
     onNavIconClick = {
@@ -52,6 +57,7 @@ fun TaskScreenRoute(
       viewModel.onEvent(TaskEvent.ToggleImportance)
     },
     onDeleteClick = {
+      resultBus.sendResult(result = it)
       viewModel.onEvent(TaskEvent.DeleteTask)
       onBackClick()
     }
@@ -66,7 +72,7 @@ fun TaskScreen(
   onRemindSelection: (TaskScheduleSelection) -> Unit = {},
   onCompletedChange: (Boolean) -> Unit = {},
   onImportanceClick: () -> Unit = {},
-  onDeleteClick: () -> Unit = {},
+  onDeleteClick: (Task) -> Unit = {},
 ) {
   Scaffold(
     topBar = {
@@ -81,11 +87,11 @@ fun TaskScreen(
         actions = {
           IconButton(onClick = onImportanceClick) {
             Icon(
-              imageVector = if (state.important) Icons.Default.Star else Icons.Default.StarBorder,
-              contentDescription = if (state.important) "Remove star" else "Add star"
+              imageVector = if (state.task.important) Icons.Default.Star else Icons.Default.StarBorder,
+              contentDescription = if (state.task.important) "Remove star" else "Add star"
             )
           }
-          IconButton(onClick = onDeleteClick) {
+          IconButton(onClick = { onDeleteClick(state.task) }) {
             Icon(
               imageVector = Icons.Default.DeleteOutline,
               contentDescription = "Delete task"
@@ -105,8 +111,8 @@ fun TaskScreen(
       ) {
 
         TodoCheckItem(
-          text = state.content,
-          checked = state.completed,
+          text = state.task.content,
+          checked = state.task.completed,
           style = MaterialTheme.typography.titleLarge,
           modifier = Modifier.padding(start = 4.dp),
           onCheckedChange = onCompletedChange
@@ -132,12 +138,12 @@ fun TaskScreen(
       HorizontalDivider(Modifier.padding(vertical = 4.dp))
 
       RemindActionRow(
-        remind = state.remind,
+        remind = state.task.remind,
         onRemindSelection = onRemindSelection
       )
 
       DueActionRow(
-        due = state.due,
+        due = state.task.due,
         onDueSelection = onDueSelection
       )
 
@@ -168,10 +174,13 @@ fun TaskScreen(
 fun TaskScreenPreview() {
   TaskScreen(
     TaskState(
-      content = "Programming is hard",
-      completed = true,
-      important = true,
-      due = LocalDate(2025, 7, 12)
+      Task(
+        content = "Programming is hard",
+        completed = true,
+        important = true,
+        due = LocalDate(2025, 7, 12),
+        creation = Instant.fromEpochMilliseconds(0)
+      )
     )
   )
 }

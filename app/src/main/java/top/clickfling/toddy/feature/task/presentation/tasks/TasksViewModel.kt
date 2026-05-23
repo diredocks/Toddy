@@ -28,7 +28,6 @@ class TasksViewModel @Inject constructor(
   var state by mutableStateOf(TasksState())
     private set
 
-  private var recentlyDeletedTask: Task? = null
   private var getTasksJob: Job? = null
 
   init {
@@ -40,7 +39,7 @@ class TasksViewModel @Inject constructor(
       is TasksEvents.DeleteTask -> {
         viewModelScope.launch {
           taskUseCases.deleteTask(event.task)
-          recentlyDeletedTask = event.task
+          state = state.copy(recentlyDeletedTask = event.task)
         }
       }
 
@@ -91,10 +90,18 @@ class TasksViewModel @Inject constructor(
         state = state.copy(remind = event.remindSelection.toRemindTime())
       }
 
+      is TasksEvents.StoreRecentlyDeletedTask -> {
+        state = state.copy(recentlyDeletedTask = event.task)
+      }
+
+      TasksEvents.DeleteRecentlyDeletedTask -> {
+        state = state.copy(recentlyDeletedTask = null)
+      }
+
       TasksEvents.RestoreTask -> {
         viewModelScope.launch {
-          taskUseCases.addTask(recentlyDeletedTask ?: return@launch)
-          recentlyDeletedTask = null
+          taskUseCases.addTask(state.recentlyDeletedTask ?: return@launch)
+          state = state.copy(recentlyDeletedTask = null)
         }
       }
 

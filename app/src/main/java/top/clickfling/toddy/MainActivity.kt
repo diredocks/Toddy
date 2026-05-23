@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.runtime.result.rememberResultEventBusNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import top.clickfling.toddy.feature.task.presentation.task.TaskScreenRoute
@@ -35,8 +36,9 @@ class MainActivity : ComponentActivity() {
             backStack = backStack,
             onBack = { backStack.removeLastOrNull() },
             entryDecorators = listOf(
-              rememberSaveableStateHolderNavEntryDecorator(),
               rememberViewModelStoreNavEntryDecorator(),
+              rememberSaveableStateHolderNavEntryDecorator(),
+              rememberResultEventBusNavEntryDecorator()
             ),
             entryProvider = entryProvider {
               entry<Screen.Tasks> {

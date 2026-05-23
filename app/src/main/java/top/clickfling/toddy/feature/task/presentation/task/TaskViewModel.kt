@@ -25,8 +25,6 @@ class TaskViewModel @AssistedInject constructor(
   var state by mutableStateOf(TaskState())
     private set
 
-  private var currentTask: Task? = null
-
   init {
     loadTask(key.taskId)
   }
@@ -58,49 +56,32 @@ class TaskViewModel @AssistedInject constructor(
   }
 
   private fun loadTask(taskId: Int?) {
-    if (taskId == null || currentTask?.id == taskId) {
+    if (taskId == null || state.task.id == taskId) {
       return
     }
 
     viewModelScope.launch {
       taskUseCases.getTask(taskId)?.also { task ->
-        currentTask = task
-        state = state.copy(
-          content = task.content,
-          completed = task.completed,
-          important = task.important,
-          due = task.due,
-          remind = task.remind
-        )
+        state = state.copy(task = task)
       }
     }
   }
 
   private fun updateTask(transform: (Task) -> Task) {
-    val task = currentTask ?: return
-
     viewModelScope.launch {
-      val updatedTask = transform(task)
+      val updatedTask = transform(state.task)
 
       try {
         taskUseCases.addTask(updatedTask)
-        currentTask = updatedTask
-        state = state.copy(
-          completed = updatedTask.completed,
-          important = updatedTask.important,
-          due = updatedTask.due,
-          remind = updatedTask.remind
-        )
+        state = state.copy(task = updatedTask)
       } catch (_: InvalidTaskException) {
       }
     }
   }
 
   private fun deleteCurrentTask() {
-    val task = currentTask ?: return
-
     viewModelScope.launch {
-      taskUseCases.deleteTask(task)
+      taskUseCases.deleteTask(state.task)
     }
   }
 

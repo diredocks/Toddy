@@ -12,8 +12,10 @@ sealed class TasksEvents {
   data class ToggleImportance(val task: Task) : TasksEvents()
   data class SelectDue(val dueSelection: TaskScheduleSelection) : TasksEvents()
   data class SelectRemind(val remindSelection: TaskScheduleSelection) : TasksEvents()
+  data class StoreRecentlyDeletedTask(val task: Task) : TasksEvents()
   object RestoreTask : TasksEvents()
   object ToggleCompletedVisibility : TasksEvents()
   object ToggleSheetVisibility : TasksEvents()
   object SaveTask : TasksEvents()
+  object DeleteRecentlyDeletedTask : TasksEvents()
 }

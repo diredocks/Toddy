@@ -1,14 +1,15 @@
 package top.clickfling.toddy.feature.task.presentation.task
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Star
@@ -20,13 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.result.LocalResultEventBus
 import kotlinx.datetime.LocalDate
+import top.clickfling.toddy.feature.task.domain.model.Step
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import top.clickfling.toddy.feature.task.presentation.task.components.AddStepRow
@@ -67,6 +68,15 @@ fun TaskScreenRoute(
       resultBus.sendResult(result = it)
       viewModel.onEvent(TaskEvent.DeleteTask)
       onBackClick()
+    },
+    onAddStep = { content ->
+      viewModel.onEvent(TaskEvent.AddStep(content))
+    },
+    onStepContentChange = { stepId, content ->
+      viewModel.onEvent(TaskEvent.UpdateStepContent(stepId, content))
+    },
+    onStepCompletedChange = { stepId ->
+      viewModel.onEvent(TaskEvent.ToggleStepCompleted(stepId))
     }
   )
 }
@@ -81,6 +91,9 @@ fun TaskScreen(
   onImportanceClick: () -> Unit = {},
   onContentChange: (String) -> Unit = {},
   onDeleteClick: (Task) -> Unit = {},
+  onAddStep: (String) -> Unit = {},
+  onStepContentChange: (stepId: String, content: String) -> Unit = { _, _ -> },
+  onStepCompletedChange: (stepId: String) -> Unit = {},
 ) {
   Scaffold(
     topBar = {
@@ -127,21 +140,33 @@ fun TaskScreen(
           onContentChange = onContentChange
         )
 
-        TodoCheckItem(
-          text = "Let's go shopping",
-          checked = true,
-          style = MaterialTheme.typography.bodyLarge,
-          modifier = Modifier.padding(start = 12.dp)
-        )
+        state.task.steps.forEach { step ->
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            TodoCheckItem(
+              text = step.content,
+              checked = step.completed,
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier
+                .weight(1f)
+                .padding(start = 12.dp),
+              onCheckedChange = { onStepCompletedChange(step.id) },
+              onContentChange = { onStepContentChange(step.id, it) }
+            )
+            IconButton(onClick = { onStepContentChange(step.id, "") }) {
+              Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove step",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+              )
+            }
+          }
+        }
 
-        TodoCheckItem(
-          text = "Then touch the grass",
-          checked = false,
-          style = MaterialTheme.typography.bodyLarge,
-          modifier = Modifier.padding(start = 12.dp)
-        )
-
-        AddStepRow()
+        AddStepRow(onSubmit = onAddStep)
       }
 
       HorizontalDivider(Modifier.padding(vertical = 4.dp))
@@ -188,7 +213,11 @@ fun TaskScreenPreview() {
         completed = true,
         important = true,
         due = LocalDate(2025, 7, 12),
-        creation = Instant.fromEpochMilliseconds(0)
+        creation = Instant.fromEpochMilliseconds(0),
+        steps = listOf(
+          Step(id = "1", content = "Let's go shopping", completed = true),
+          Step(id = "2", content = "Then touch the grass", completed = false),
+        )
       )
     )
   )

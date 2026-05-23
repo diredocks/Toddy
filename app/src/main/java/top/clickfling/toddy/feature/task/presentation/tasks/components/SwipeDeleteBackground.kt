@@ -55,7 +55,7 @@ fun SwipeDeleteBackground(
 
         val backgroundColor = lerp(
           start = MaterialTheme.colorScheme.outlineVariant,
-          stop = Color.Red,
+          stop = MaterialTheme.colorScheme.error,
           fraction = progress
         )
 

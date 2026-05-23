@@ -10,6 +10,7 @@ fun TaskEntity.toDomain(): Task {
     due = due,
     creation = creation,
     remind = remind,
+    steps = steps,
     id = id
   )
 }
@@ -22,6 +23,7 @@ fun Task.toEntity(): TaskEntity {
     due = due,
     creation = creation,
     remind = remind,
+    steps = steps,
     id = id
   )
 }

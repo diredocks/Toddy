@@ -71,4 +71,5 @@ dependencies {
   implementation(libs.coroutines.android)
 
   implementation(libs.kotlinx.datetime)
+  implementation(libs.kotlinx.serialization.json)
 }

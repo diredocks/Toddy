@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +43,8 @@ fun TodoActionRow(
     ) {
       Icon(
         imageVector = icon,
-        contentDescription = null
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
       )
     }
 

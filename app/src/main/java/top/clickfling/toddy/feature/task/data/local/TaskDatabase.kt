@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import top.clickfling.toddy.feature.task.data.local.converter.InstantConverter
 import top.clickfling.toddy.feature.task.data.local.converter.LocalDateConverter
+import top.clickfling.toddy.feature.task.data.local.converter.StepListConverter
 
 @Database(
   entities = [TaskEntity::class],
@@ -12,7 +13,8 @@ import top.clickfling.toddy.feature.task.data.local.converter.LocalDateConverter
 )
 @TypeConverters(
   LocalDateConverter::class,
-  InstantConverter::class
+  InstantConverter::class,
+  StepListConverter::class,
 )
 abstract class TaskDatabase : RoomDatabase() {
   abstract val taskDao: TaskDao

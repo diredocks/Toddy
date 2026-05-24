@@ -170,7 +170,7 @@ fun TaskScreen(
             }
           }
 
-          item {
+          item(key = "add_step_input") {
             AddStepRow(onSubmit = onAddStep, modifier = Modifier.animateItem())
           }
         }

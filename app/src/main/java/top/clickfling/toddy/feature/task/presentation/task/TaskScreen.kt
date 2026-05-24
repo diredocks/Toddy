@@ -1,10 +1,13 @@
 package top.clickfling.toddy.feature.task.presentation.task
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
@@ -65,7 +68,7 @@ fun TaskScreenRoute(
       viewModel.onEvent(TaskEvent.OnContentChange(it))
     },
     onDeleteClick = { task ->
-      resultBus.sendResult(result = Pair(task, viewModel.state.steps))
+      resultBus.sendResult(result = viewModel.state.task)
       viewModel.onEvent(TaskEvent.DeleteTask)
       onBackClick()
     },
@@ -140,33 +143,37 @@ fun TaskScreen(
           onContentChange = onContentChange
         )
 
-        state.steps.forEach { step ->
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-          ) {
-            TodoCheckItem(
-              text = step.content,
-              checked = step.completed,
-              style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier
-                .weight(1f)
-                .padding(start = 12.dp),
-              onCheckedChange = { onStepCompletedChange(step.id) },
-              onContentChange = { onStepContentChange(step.id, it) }
-            )
-            IconButton(onClick = { onStepContentChange(step.id, "") }) {
-              Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove step",
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+        LazyColumn(modifier = Modifier.animateContentSize()) {
+          items(items = state.task.steps, key = { it.id }) { step ->
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.fillMaxWidth().animateItem()
+            ) {
+              TodoCheckItem(
+                text = step.content,
+                checked = step.completed,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                  .weight(1f)
+                  .padding(start = 12.dp),
+                onCheckedChange = { onStepCompletedChange(step.id) },
+                onContentChange = { onStepContentChange(step.id, it) }
               )
+              IconButton(onClick = { onStepContentChange(step.id, "") }) {
+                Icon(
+                  imageVector = Icons.Default.Close,
+                  contentDescription = "Remove step",
+                  modifier = Modifier.size(20.dp),
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+              }
             }
           }
-        }
 
-        AddStepRow(onSubmit = onAddStep)
+          item {
+            AddStepRow(onSubmit = onAddStep, modifier = Modifier.animateItem())
+          }
+        }
       }
 
       HorizontalDivider(Modifier.padding(vertical = 4.dp))
@@ -214,10 +221,10 @@ fun TaskScreenPreview() {
         important = true,
         due = LocalDate(2025, 7, 12),
         creation = Instant.fromEpochMilliseconds(0),
-      ),
-      steps = listOf(
-        Step(id = "1", content = "Let's go shopping", completed = true),
-        Step(id = "2", content = "Then touch the grass", completed = false),
+        steps = listOf(
+          Step(id = "1", content = "Let's go shopping", completed = true),
+          Step(id = "2", content = "Then touch the grass", completed = false),
+        )
       )
     )
   )

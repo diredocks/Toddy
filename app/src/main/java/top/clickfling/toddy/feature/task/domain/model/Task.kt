@@ -10,6 +10,7 @@ data class Task(
   val creation: Instant,
   val due: LocalDate? = null,
   val remind: Instant? = null,
+  val steps: List<Step> = emptyList(),
   val id: Int? = null,
 )
 

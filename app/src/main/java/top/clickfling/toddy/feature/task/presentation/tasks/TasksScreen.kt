@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.result.LocalResultEventBus
 import kotlinx.datetime.LocalDate
-import top.clickfling.toddy.feature.task.domain.model.Step
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.presentation.common.util.TaskScheduleSelection
 import top.clickfling.toddy.feature.task.presentation.tasks.components.AddTaskBottomSheet
@@ -51,11 +50,11 @@ fun TasksScreenRoute(
   viewModel: TasksViewModel = hiltViewModel(),
 ) {
   val state = viewModel.state
-  val resultStore = LocalResultEventBus.current.conflateAsState<Pair<Task, List<Step>>?>(null)
+  val resultStore = LocalResultEventBus.current.conflateAsState<Task?>(null)
   LaunchedEffect(resultStore.value) {
-    val (task, steps) = resultStore.value ?: return@LaunchedEffect
+    val task = resultStore.value ?: return@LaunchedEffect
     viewModel.onEvent(
-      TasksEvents.StoreRecentlyDeletedTask(task, steps)
+      TasksEvents.StoreRecentlyDeletedTask(task)
     )
   }
 

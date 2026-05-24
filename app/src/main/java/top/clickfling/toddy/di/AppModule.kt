@@ -9,15 +9,11 @@ import dagger.hilt.components.SingletonComponent
 import top.clickfling.toddy.feature.task.data.local.TaskDatabase
 import top.clickfling.toddy.feature.task.data.repository.TaskRepositoryImpl
 import top.clickfling.toddy.feature.task.domain.repository.TaskRepository
-import top.clickfling.toddy.feature.task.domain.useCase.AddStep
 import top.clickfling.toddy.feature.task.domain.useCase.AddTask
-import top.clickfling.toddy.feature.task.domain.useCase.DeleteStep
 import top.clickfling.toddy.feature.task.domain.useCase.DeleteTask
-import top.clickfling.toddy.feature.task.domain.useCase.GetStepsForTask
 import top.clickfling.toddy.feature.task.domain.useCase.GetTask
 import top.clickfling.toddy.feature.task.domain.useCase.GetTasks
 import top.clickfling.toddy.feature.task.domain.useCase.TaskUseCases
-import top.clickfling.toddy.feature.task.domain.useCase.UpdateStep
 import javax.inject.Singleton
 
 @Module
@@ -36,7 +32,7 @@ object AppModule {
   @Provides
   @Singleton
   fun provideTaskRepository(db: TaskDatabase): TaskRepository {
-    return TaskRepositoryImpl(db.taskDao, db.stepDao)
+    return TaskRepositoryImpl(db.taskDao)
   }
 
   @Provides
@@ -47,10 +43,6 @@ object AppModule {
       getTasks = GetTasks(repository),
       addTask = AddTask(repository),
       deleteTask = DeleteTask(repository),
-      addStep = AddStep(repository),
-      updateStep = UpdateStep(repository),
-      deleteStep = DeleteStep(repository),
-      getStepsForTask = GetStepsForTask(repository),
     )
   }
 }

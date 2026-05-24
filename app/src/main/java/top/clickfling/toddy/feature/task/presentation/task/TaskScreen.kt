@@ -140,7 +140,7 @@ fun TaskScreen(
           onContentChange = onContentChange
         )
 
-        state.task.steps.forEach { step ->
+        state.steps.forEach { step ->
           Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -214,10 +214,10 @@ fun TaskScreenPreview() {
         important = true,
         due = LocalDate(2025, 7, 12),
         creation = Instant.fromEpochMilliseconds(0),
-        steps = listOf(
-          Step(id = "1", content = "Let's go shopping", completed = true),
-          Step(id = "2", content = "Then touch the grass", completed = false),
-        )
+      ),
+      steps = listOf(
+        Step(id = "1", content = "Let's go shopping", completed = true),
+        Step(id = "2", content = "Then touch the grass", completed = false),
       )
     )
   )

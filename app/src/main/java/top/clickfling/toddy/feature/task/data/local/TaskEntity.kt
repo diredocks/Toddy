@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
-import top.clickfling.toddy.feature.task.domain.model.Step
 
 @Entity
 data class TaskEntity(
@@ -14,6 +13,5 @@ data class TaskEntity(
   val creation: Instant,
   val due: LocalDate? = null,
   val remind: Instant? = null,
-  val steps: List<Step> = emptyList(),
   @PrimaryKey val id: Int? = null,
 )

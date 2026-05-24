@@ -9,6 +9,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -28,6 +31,8 @@ class TaskViewModel @AssistedInject constructor(
 ) : ViewModel() {
   var state by mutableStateOf(TaskState())
     private set
+
+  private var stepsJob: Job? = null
 
   init {
     loadTask(key.taskId)
@@ -64,30 +69,36 @@ class TaskViewModel @AssistedInject constructor(
       }
 
       is TaskEvent.AddStep -> {
+        val taskId = state.task.id ?: return
         val newStep = Step(
           id = Uuid.random().toString(),
           content = event.content,
+          order = state.steps.size,
         )
-        updateTask { it.copy(steps = it.steps + newStep) }
+        viewModelScope.launch {
+          taskUseCases.addStep(newStep, taskId)
+        }
       }
 
       is TaskEvent.UpdateStepContent -> {
+        val taskId = state.task.id ?: return
         if (event.content.isBlank()) {
-          updateTask { it.copy(steps = it.steps.filter { s -> s.id != event.stepId }) }
+          viewModelScope.launch {
+            taskUseCases.deleteStep(event.stepId)
+          }
         } else {
-          updateTask {
-            it.copy(steps = it.steps.map { s ->
-              if (s.id == event.stepId) s.copy(content = event.content) else s
-            })
+          val currentStep = state.steps.find { it.id == event.stepId } ?: return
+          viewModelScope.launch {
+            taskUseCases.updateStep(currentStep.copy(content = event.content), taskId)
           }
         }
       }
 
       is TaskEvent.ToggleStepCompleted -> {
-        updateTask {
-          it.copy(steps = it.steps.map { s ->
-            if (s.id == event.stepId) s.copy(completed = !s.completed) else s
-          })
+        val taskId = state.task.id ?: return
+        val currentStep = state.steps.find { it.id == event.stepId } ?: return
+        viewModelScope.launch {
+          taskUseCases.updateStep(currentStep.copy(completed = !currentStep.completed), taskId)
         }
       }
     }
@@ -103,6 +114,13 @@ class TaskViewModel @AssistedInject constructor(
         state = state.copy(task = task)
       }
     }
+
+    stepsJob?.cancel()
+    stepsJob = taskUseCases.getStepsForTask(taskId)
+      .onEach { steps ->
+        state = state.copy(steps = steps)
+      }
+      .launchIn(viewModelScope)
   }
 
   private fun updateTask(transform: (Task) -> Task) {

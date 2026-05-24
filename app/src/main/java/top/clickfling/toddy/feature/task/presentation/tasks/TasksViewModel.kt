@@ -95,7 +95,11 @@ class TasksViewModel @Inject constructor(
       }
 
       TasksEvents.DeleteRecentlyDeletedTask -> {
-        state = state.copy(recentlyDeletedTask = null)
+        viewModelScope.launch {
+          val task = state.recentlyDeletedTask
+          state = state.copy(recentlyDeletedTask = null)
+          task?.id?.let { taskUseCases.deleteStepsByTaskId(it) }
+        }
       }
 
       TasksEvents.RestoreTask -> {

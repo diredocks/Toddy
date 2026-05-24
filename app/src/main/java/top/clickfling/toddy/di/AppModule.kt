@@ -12,6 +12,7 @@ import top.clickfling.toddy.feature.task.domain.repository.TaskRepository
 import top.clickfling.toddy.feature.task.domain.useCase.AddStep
 import top.clickfling.toddy.feature.task.domain.useCase.AddTask
 import top.clickfling.toddy.feature.task.domain.useCase.DeleteStep
+import top.clickfling.toddy.feature.task.domain.useCase.DeleteStepsByTaskId
 import top.clickfling.toddy.feature.task.domain.useCase.DeleteTask
 import top.clickfling.toddy.feature.task.domain.useCase.GetStepsForTask
 import top.clickfling.toddy.feature.task.domain.useCase.GetTask
@@ -51,6 +52,7 @@ object AppModule {
       updateStep = UpdateStep(repository),
       deleteStep = DeleteStep(repository),
       getStepsForTask = GetStepsForTask(repository),
+      deleteStepsByTaskId = DeleteStepsByTaskId(repository),
     )
   }
 }

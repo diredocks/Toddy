@@ -12,5 +12,6 @@ interface TaskRepository {
   suspend fun insertStep(step: Step, taskId: Int)
   suspend fun updateStep(step: Step, taskId: Int)
   suspend fun deleteStep(stepId: String)
+  suspend fun deleteStepsByTaskId(taskId: Int)
   fun getStepsByTaskId(taskId: Int): Flow<List<Step>>
 }

@@ -42,10 +42,6 @@ class TaskRepositoryImpl(
     stepDao.deleteStepById(stepId)
   }
 
-  override suspend fun deleteStepsByTaskId(taskId: Int) {
-    stepDao.deleteStepsByTaskId(taskId)
-  }
-
   override fun getStepsByTaskId(taskId: Int): Flow<List<Step>> {
     return stepDao.getStepsByTaskId(taskId).map { entities ->
       entities.map { it.toDomain() }

@@ -9,5 +9,4 @@ data class TaskUseCases(
   val updateStep: UpdateStep,
   val deleteStep: DeleteStep,
   val getStepsForTask: GetStepsForTask,
-  val deleteStepsByTaskId: DeleteStepsByTaskId,
 )

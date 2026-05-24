@@ -23,7 +23,4 @@ interface StepDao {
 
     @Query("DELETE FROM step_entity WHERE id = :stepId")
     suspend fun deleteStepById(stepId: String)
-
-    @Query("DELETE FROM step_entity WHERE taskId = :taskId")
-    suspend fun deleteStepsByTaskId(taskId: Int)
 }

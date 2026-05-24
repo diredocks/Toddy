@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey
             entity = TaskEntity::class,
             parentColumns = ["id"],
             childColumns = ["taskId"],
+            onDelete = ForeignKey.CASCADE,
         )
     ],
     indices = [Index("taskId")]

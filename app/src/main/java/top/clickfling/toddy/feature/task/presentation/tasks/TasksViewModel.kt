@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import top.clickfling.toddy.feature.task.domain.model.InvalidTaskException
+import top.clickfling.toddy.feature.task.domain.model.Step
 import top.clickfling.toddy.feature.task.domain.model.Task
 import top.clickfling.toddy.feature.task.domain.useCase.TaskUseCases
 import top.clickfling.toddy.feature.task.domain.util.TaskOrder
@@ -38,8 +40,10 @@ class TasksViewModel @Inject constructor(
     when (event) {
       is TasksEvents.DeleteTask -> {
         viewModelScope.launch {
+          val flow = event.task.id?.let { taskUseCases.getStepsForTask(it) }
+          val steps = if (flow != null) flow.first() else emptyList()
           taskUseCases.deleteTask(event.task)
-          state = state.copy(recentlyDeletedTask = event.task)
+          state = state.copy(recentlyDeletedTask = event.task, recentlyDeletedSteps = steps)
         }
       }
 
@@ -91,21 +95,23 @@ class TasksViewModel @Inject constructor(
       }
 
       is TasksEvents.StoreRecentlyDeletedTask -> {
-        state = state.copy(recentlyDeletedTask = event.task)
+        state = state.copy(recentlyDeletedTask = event.task, recentlyDeletedSteps = event.steps)
       }
 
       TasksEvents.DeleteRecentlyDeletedTask -> {
-        viewModelScope.launch {
-          val task = state.recentlyDeletedTask
-          state = state.copy(recentlyDeletedTask = null)
-          task?.id?.let { taskUseCases.deleteStepsByTaskId(it) }
-        }
+        state = state.copy(recentlyDeletedTask = null, recentlyDeletedSteps = emptyList())
       }
 
       TasksEvents.RestoreTask -> {
         viewModelScope.launch {
-          taskUseCases.addTask(state.recentlyDeletedTask ?: return@launch)
-          state = state.copy(recentlyDeletedTask = null)
+          val task = state.recentlyDeletedTask ?: return@launch
+          taskUseCases.addTask(task)
+          task.id?.let { taskId ->
+            state.recentlyDeletedSteps.forEach { step ->
+              taskUseCases.addStep(step, taskId)
+            }
+          }
+          state = state.copy(recentlyDeletedTask = null, recentlyDeletedSteps = emptyList())
         }
       }
 

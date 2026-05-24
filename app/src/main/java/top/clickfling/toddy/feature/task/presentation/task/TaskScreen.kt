@@ -64,8 +64,8 @@ fun TaskScreenRoute(
     onContentChange = {
       viewModel.onEvent(TaskEvent.OnContentChange(it))
     },
-    onDeleteClick = {
-      resultBus.sendResult(result = it)
+    onDeleteClick = { task ->
+      resultBus.sendResult(result = Pair(task, viewModel.state.steps))
       viewModel.onEvent(TaskEvent.DeleteTask)
       onBackClick()
     },

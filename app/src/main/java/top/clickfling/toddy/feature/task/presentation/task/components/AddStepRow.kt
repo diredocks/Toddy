@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
@@ -65,7 +64,6 @@ fun AddStepRow(
           onSubmit(content)
         }
         text = ""
-        focusManager.clearFocus()
       }
     ),
     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
